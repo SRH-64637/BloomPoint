@@ -1,0 +1,73 @@
+/* stylelint-disable-next-line at-rule-no-unknown */
+@tailwind base;
+/* stylelint-disable-next-line at-rule-no-unknown */
+@tailwind components;
+/* stylelint-disable-next-line at-rule-no-unknown */
+@tailwind utilities;
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+@layer base {
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  
+  :root {
+    /* Blush Noir Theme */
+    --background: 0 4% 7%;          /* #121010 */
+    --foreground: 0 38% 96%;        /* #F8EDEE */
+
+    --card: 0 4% 7%;                /* #121010 */
+    --card-foreground: 0 38% 96%;   /* #F8EDEE */
+
+    --popover: 0 4% 7%;             
+    --popover-foreground: 0 38% 96%;
+
+    --primary: 0 89% 71%;           /* #F87171 */
+    --primary-foreground: 0 4% 7%;  /* #121010 */
+
+    --secondary: 0 72% 50%;         /* #DC2626 */
+    --secondary-foreground: 0 38% 96%;
+
+    --muted: 0 20% 30%;             /* softer charcoal for borders */
+    --muted-foreground: 0 20% 70%;  
+
+    --accent: 0 62% 29%;            /* #7F1D1D */
+    --accent-foreground: 0 38% 96%;
+
+    --destructive: 0 80% 35%;       /* warning red */
+    --destructive-foreground: 0 38% 96%;
+
+    --border: 0 20% 30%;
+    --input: 0 20% 30%;
+    --ring: 0 89% 71%;              /* glow with primary */
+  }
+}
+
+
+@layer base {
+  body {
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 rounded-full font-semibold;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  .btn-outline {
+    @apply px-6 py-3 rounded-full font-semibold border;
+    border-color: hsl(var(--primary));
+    color: hsl(var(--primary));
+  }
+}
