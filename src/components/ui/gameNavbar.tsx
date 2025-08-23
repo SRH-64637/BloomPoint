@@ -24,7 +24,7 @@ export default function GameNavbar() {
     { href: "/skills", label: "Skill Forge" },
     { href: "/quests", label: "Quest Board" },
     { href: "/lounge", label: "Lounge" },
-    { href: "/wellness", label: "Wellness" },
+    { href: "/wellness", label: "Zen Den" },
     { href: "/jobs", label: "Jobs" },
   ];
 
@@ -37,7 +37,10 @@ export default function GameNavbar() {
         </div>
         <div className="hidden lg:flex absolute left-1/2 transform -translate-x-1/2 space-x-6 gap-4">
           {navLinks.map((link) => (
-            <div key={link.href} className="text-sm tracking-wider font-mono text-white">
+            <div
+              key={link.href}
+              className="text-sm tracking-wider font-mono text-white"
+            >
               {link.label}
             </div>
           ))}
