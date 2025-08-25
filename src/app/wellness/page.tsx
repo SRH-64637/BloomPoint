@@ -1,5 +1,5 @@
 "use client";
-
+import { useUser } from "@clerk/nextjs";
 import { useEffect, useMemo, useRef, useState, MutableRefObject } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 
 export default function WellnessPage() {
+  const { user } = useUser();
   // Breathing cycle
   const [phase, setPhase] = useState<"inhale" | "hold" | "exhale">("inhale");
   useEffect(() => {
@@ -96,10 +97,86 @@ export default function WellnessPage() {
   // Journaling
   const [entry, setEntry] = useState("");
   const [savedTick, setSavedTick] = useState(0);
-  const saveJournal = () => {
-    if (!entry.trim()) return;
-    setEntry("");
-    setSavedTick((n) => n + 1);
+  const [logs, setLogs] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      setIsLoading(true);
+      try {
+        const res = await fetch("/api/wellness");
+        if (res.ok) {
+          const data = await res.json();
+          console.log("Fetched logs:", data); // Debug log
+
+          // Ensure logs is always an array
+          if (Array.isArray(data)) {
+            setLogs(data);
+          } else {
+            console.error("Expected array of logs, got:", data);
+            setLogs([]);
+          }
+        } else {
+          console.error("Failed to fetch logs, status:", res.status);
+          setLogs([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch logs:", error);
+        setLogs([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchLogs();
+  }, []);
+
+  const saveJournal = async () => {
+    if (!entry.trim()) {
+      alert("Please enter some text before saving.");
+      return;
+    }
+
+    if (!user) {
+      alert("Please sign in to save journal entries.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      const res = await fetch("/api/wellness", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          entry: entry.trim(),
+        }),
+      });
+
+      const response = await res.json();
+      console.log("Save response:", response); // Debug log
+
+      if (res.ok) {
+        // The API returns { message: "...", wellnessLog: {...} }
+        const newLog = response.wellnessLog;
+        if (newLog) {
+          setEntry("");
+          setLogs((prev) => [newLog, ...prev]);
+          console.log("Journal entry saved successfully!");
+        } else {
+          console.error("No wellnessLog in response:", response);
+          alert("Failed to save entry. Please try again.");
+        }
+      } else {
+        console.error("Save failed:", response);
+        alert(`Failed to save: ${response.error || "Unknown error"}`);
+      }
+    } catch (error) {
+      console.error("Failed to save journal:", error);
+      alert("Failed to save journal entry. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   // Affirmations
@@ -320,6 +397,7 @@ export default function WellnessPage() {
         </motion.div>
 
         {/* Journaling */}
+
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -342,12 +420,68 @@ export default function WellnessPage() {
               <div className="mt-4 flex items-center gap-3">
                 <Button
                   onClick={saveJournal}
-                  className="bg-sky-600 hover:bg-sky-700 rounded-xl"
+                  disabled={isSaving || !entry.trim()}
+                  className="bg-sky-600 hover:bg-sky-700 rounded-xl disabled:opacity-50"
                 >
-                  Save
+                  {isSaving ? "Saving..." : "Save"}
                 </Button>
-                {savedTick > 0 && (
-                  <span className="text-sm text-gray-300">Saved.</span>
+                {isSaving && (
+                  <div className="text-sm text-gray-400">
+                    Saving your entry...
+                  </div>
+                )}
+              </div>
+
+              {/* Display saved logs */}
+              <div className="mt-6 space-y-2">
+                {isLoading ? (
+                  <div className="text-center text-gray-400 py-4">
+                    Loading your wellness logs...
+                  </div>
+                ) : Array.isArray(logs) && logs.length > 0 ? (
+                  logs.map((log) => (
+                    <div
+                      key={log._id}
+                      className="p-3 bg-white/5 rounded-lg text-white/90"
+                    >
+                      <div className="text-sm">{log.entry}</div>
+                      <div className="text-xs text-gray-400 mt-2">
+                        {new Date(log.createdAt).toLocaleString()}
+                      </div>
+                      <div className="mt-2 flex gap-2">
+                        <button
+                          onClick={async () => {
+                            try {
+                              const res = await fetch(
+                                `/api/wellness?id=${log._id}`,
+                                { method: "DELETE" }
+                              );
+                              if (res.ok) {
+                                setLogs((prev) =>
+                                  prev.filter((l) => l._id !== log._id)
+                                );
+                              } else {
+                                const e = await res.json();
+                                alert(e.error || "Failed to delete");
+                              }
+                            } catch (e) {
+                              console.error(e);
+                              alert("Failed to delete");
+                            }
+                          }}
+                          className="text-xs text-red-300 hover:text-red-200"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center text-gray-400 py-4">
+                    {isLoading
+                      ? "Loading..."
+                      : "No wellness logs yet. Start journaling above!"}
+                  </div>
                 )}
               </div>
             </CardContent>

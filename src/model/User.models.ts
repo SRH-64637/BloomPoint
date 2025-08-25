@@ -1,11 +1,12 @@
 // models/User.ts
-import { Schema, model, models, Document } from "mongoose";
+import mongoose, { Schema, model, models, Document } from "mongoose";
 
 export type UserRole = "USER" | "EMPLOYER" | "ADMIN";
 
 export interface IUser extends Document {
-  email: string;
-  name: string;
+  clerkId: string; // Clerk user ID
+  email?: string; // Optional, since Clerk manages it
+  name?: string;
   role: UserRole;
   createdAt: Date;
   updatedAt: Date;
@@ -13,8 +14,9 @@ export interface IUser extends Document {
 
 const UserSchema: Schema<IUser> = new Schema(
   {
-    email: { type: String, required: true, unique: true },
-    name: { type: String, required: true },
+    clerkId: { type: String, required: true, unique: true }, // main link to Clerk
+    email: { type: String }, // not required, just for convenience
+    name: { type: String },
     role: {
       type: String,
       enum: ["USER", "EMPLOYER", "ADMIN"],
@@ -24,4 +26,5 @@ const UserSchema: Schema<IUser> = new Schema(
   { timestamps: true }
 );
 
-export const User = models.User<IUser> || model<IUser>("User", UserSchema);
+export const User =
+  (models.User as mongoose.Model<IUser>) || model<IUser>("User", UserSchema);

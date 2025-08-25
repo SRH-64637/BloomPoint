@@ -22,10 +22,9 @@ export default function GameNavbar() {
   const navLinks = [
     { href: "/camp", label: "Camp" },
     { href: "/skills", label: "Skill Forge" },
-    { href: "/quests", label: "Quest Board" },
+    { href: "/jobs", label: "Quest Board" },
     { href: "/lounge", label: "Lounge" },
     { href: "/wellness", label: "Zen Den" },
-    { href: "/jobs", label: "Jobs" },
   ];
 
   // Don't render until mounted to avoid hydration issues
