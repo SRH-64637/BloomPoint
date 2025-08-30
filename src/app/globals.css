@@ -12,44 +12,44 @@
 }
 
 @layer base {
-  html, body {
+  html,
+  body {
     margin: 0;
     padding: 0;
     height: 100%;
   }
-  
+
   :root {
     /* Blush Noir Theme */
-    --background: 0 4% 7%;          /* #121010 */
-    --foreground: 0 38% 96%;        /* #F8EDEE */
+    --background: 0 4% 7%; /* #121010 */
+    --foreground: 0 38% 96%; /* #F8EDEE */
 
-    --card: 0 4% 7%;                /* #121010 */
-    --card-foreground: 0 38% 96%;   /* #F8EDEE */
+    --card: 0 4% 7%; /* #121010 */
+    --card-foreground: 0 38% 96%; /* #F8EDEE */
 
-    --popover: 0 4% 7%;             
+    --popover: 0 4% 7%;
     --popover-foreground: 0 38% 96%;
 
-    --primary: 0 89% 71%;           /* #F87171 */
-    --primary-foreground: 0 4% 7%;  /* #121010 */
+    --primary: 0 89% 71%; /* #F87171 */
+    --primary-foreground: 0 4% 7%; /* #121010 */
 
-    --secondary: 0 72% 50%;         /* #DC2626 */
+    --secondary: 0 72% 50%; /* #DC2626 */
     --secondary-foreground: 0 38% 96%;
 
-    --muted: 0 20% 30%;             /* softer charcoal for borders */
-    --muted-foreground: 0 20% 70%;  
+    --muted: 0 20% 30%; /* softer charcoal for borders */
+    --muted-foreground: 0 20% 70%;
 
-    --accent: 0 62% 29%;            /* #7F1D1D */
+    --accent: 0 62% 29%; /* #7F1D1D */
     --accent-foreground: 0 38% 96%;
 
-    --destructive: 0 80% 35%;       /* warning red */
+    --destructive: 0 80% 35%; /* warning red */
     --destructive-foreground: 0 38% 96%;
 
     --border: 0 20% 30%;
     --input: 0 20% 30%;
-    --ring: 0 89% 71%;              /* glow with primary */
+    --ring: 0 89% 71%; /* glow with primary */
   }
 }
-
 
 @layer base {
   body {
@@ -69,5 +69,110 @@
     @apply px-6 py-3 rounded-full font-semibold border;
     border-color: hsl(var(--primary));
     color: hsl(var(--primary));
+  }
+
+  /* Global dropdown styling for better visibility */
+  select {
+    @apply text-white;
+  }
+
+  select option {
+    @apply bg-black text-white;
+  }
+
+  /* Ensure dropdowns are visible in dark themes */
+  select:focus {
+    @apply border-white/30;
+  }
+
+  /* Style for select elements to match the overall theme */
+  select {
+    background-color: hsl(var(--input));
+    border-color: hsl(var(--border));
+    color: hsl(var(--foreground));
+  }
+
+  select option {
+    background-color: hsl(var(--card));
+    color: hsl(var(--card-foreground));
+  }
+
+  /* Video player container styling */
+  .video-player-container {
+    @apply relative;
+  }
+
+  /* Custom scrollbar for lecture lists */
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+  }
+
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Card hover effects */
+  .card-hover {
+    @apply transition-all duration-300 hover:scale-[1.02] hover:shadow-lg;
+  }
+
+  /* Gradient text effects */
+  .gradient-text {
+    @apply bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent;
+  }
+
+  /* Loading skeleton animation */
+  @keyframes shimmer {
+    0% {
+      background-position: -200px 0;
+    }
+    100% {
+      background-position: calc(200px + 100%) 0;
+    }
+  }
+
+  .animate-shimmer {
+    animation: shimmer 2s infinite linear;
+    background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+    background-size: 200px 100%;
+  }
+
+  /* Line clamp utilities for text truncation */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  .line-clamp-4 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 4;
   }
 }

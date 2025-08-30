@@ -128,7 +128,6 @@ export async function POST(request: Request) {
 
     // Get authentication from Clerk
     const { userId } = await auth();
-    console.log("Clerk User ID:", userId);
 
     if (!userId) {
       console.error("No user ID found - unauthorized");
@@ -139,7 +138,6 @@ export async function POST(request: Request) {
     }
 
     const requestBody = await request.json();
-    console.log("Request body:", requestBody);
 
     const {
       title,
@@ -175,19 +173,6 @@ export async function POST(request: Request) {
     if (!employer) {
       employer = await User.create({ clerkId: userId });
     }
-
-    console.log("Creating job with data:", {
-      title: title.trim(),
-      description: `${description.trim().substring(0, 50)}...`,
-      skillsRequired,
-      level,
-      location,
-      salary,
-      type,
-      remote,
-      company,
-      employerId: employer._id,
-    });
 
     // Create the job
     const jobData = {

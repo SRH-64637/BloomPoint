@@ -7,12 +7,12 @@ import { auth } from "@clerk/nextjs/server";
 // GET: Fetch a single job by ID
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
-
-    const job = await Job.findById(params.id).populate(
+    const { id } = await params;
+    const job = await Job.findById(id).populate(
       "employerId",
       "firstName lastName email company"
     );
@@ -31,7 +31,7 @@ export async function GET(
 // PUT: Update a job
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
@@ -40,15 +40,15 @@ export async function PUT(
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const job = await Job.findById(params.id);
+    const { id } = await params;
+    const job = await Job.findById(id);
 
     if (!job) {
       return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
 
     // Resolve current Mongo user by Clerk ID
-    const currentUser = await User.findOne({ clerkId: userId });
+    const currentUser = await User.findOne({ clerkId: userId }).lean();
     if (!currentUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -62,7 +62,7 @@ export async function PUT(
     }
 
     const updates = await request.json();
-    const updatedJob = await Job.findByIdAndUpdate(params.id, updates, {
+    const updatedJob = await Job.findByIdAndUpdate(id, updates, {
       new: true,
     }).populate("employerId", "firstName lastName email");
 
@@ -82,7 +82,7 @@ export async function PUT(
 // DELETE: Delete a job
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await dbConnect();
@@ -91,15 +91,15 @@ export async function DELETE(
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const job = await Job.findById(params.id);
+    const { id } = await params;
+    const job = await Job.findById(id);
 
     if (!job) {
       return NextResponse.json({ error: "Job not found" }, { status: 404 });
     }
 
     // Resolve current Mongo user by Clerk ID
-    const currentUser = await User.findOne({ clerkId: userId });
+    const currentUser = await User.findOne({ clerkId: userId }).lean();
     if (!currentUser) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -112,7 +112,7 @@ export async function DELETE(
       );
     }
 
-    await Job.findByIdAndDelete(params.id);
+    await Job.findByIdAndDelete(id);
 
     return NextResponse.json({ message: "Job deleted successfully" });
   } catch (error) {

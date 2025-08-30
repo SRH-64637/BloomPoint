@@ -6,9 +6,18 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function EditJobPage({ params }: { params: { id: string } }) {
+export default function EditJobPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const router = useRouter();
-  const jobId = params.id;
+  const [jobId, setJobId] = useState<string>("");
+
+  // Handle async params
+  useEffect(() => {
+    params.then(({ id }) => setJobId(id));
+  }, [params]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({

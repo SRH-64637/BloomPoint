@@ -1,14 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-export default function ApplyJobPage({ params }: { params: { id: string } }) {
+export default function ApplyJobPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const router = useRouter();
-  const jobId = params.id;
+  const [jobId, setJobId] = useState<string>("");
+
+  // Handle async params
+  useEffect(() => {
+    params.then(({ id }) => setJobId(id));
+  }, [params]);
   const [coverLetter, setCoverLetter] = useState("");
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
