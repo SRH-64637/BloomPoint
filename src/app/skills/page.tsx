@@ -552,41 +552,88 @@ export default function SkillsDashboard() {
           </div>
         </div>
         {loading && <p className="text-sm text-muted-foreground">Loading…</p>}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {courses.slice(0, 6).map((c) => (
-            <Link
-              key={c._id}
-              href={`/skills/courses/${c._id}`}
-              className="group"
-            >
-              <Card className="overflow-hidden border-white/10 bg-black/20 hover:bg-black/30 transition-all duration-300">
-                <div className="relative h-40 w-full overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 transition-transform duration-300 group-hover:scale-110" />
-                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-4 opacity-100 transition-opacity duration-300 group-hover:opacity-0">
-                    <h3 className="text-lg font-semibold">{c.title}</h3>
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center p-4 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    <p className="text-sm text-white/90">{c.description}</p>
-                  </div>
-                </div>
-                <CardContent className="space-y-3 p-4">
-                  <div className="flex flex-wrap gap-2">
-                    {c.tags?.slice(0, 3).map((t) => (
-                      <Badge key={t} variant="secondary">
-                        {t}
-                      </Badge>
-                    ))}
-                  </div>
-                  {c.difficulty && (
-                    <Badge variant="outline" className="text-xs">
-                      {c.difficulty}
-                    </Badge>
-                  )}
-                </CardContent>
-              </Card>
+        {!loading && courses.length === 0 && (
+          <div className="text-center py-12">
+            <GraduationCap className="w-16 h-16 text-gray-500 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-white mb-2">
+              No courses yet
+            </h3>
+            <p className="text-gray-400 mb-6">
+              Start creating courses to share your knowledge
+            </p>
+            <Link href="/skills/create">
+              <Button className="bg-gradient-to-r from-indigo-500 to-purple-500 hover:from-indigo-600 hover:to-purple-600">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Course
+              </Button>
             </Link>
-          ))}
-        </div>
+          </div>
+        )}
+        {!loading && courses.length > 0 && (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {courses.slice(0, 6).map((c) => (
+              <Link
+                key={c._id}
+                href={`/skills/courses/${c._id}`}
+                className="group"
+              >
+                <Card className="overflow-hidden border-white/10 bg-black/20 hover:bg-black/30 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/20">
+                  <div className="relative h-40 w-full overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 transition-transform duration-300 group-hover:scale-110" />
+                    <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-4 opacity-100 transition-opacity duration-300 group-hover:opacity-0">
+                      <h3 className="text-lg font-semibold text-white">
+                        {c.title}
+                      </h3>
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center p-4 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                      <p className="text-sm text-white/90">{c.description}</p>
+                    </div>
+                    {/* Course type indicator */}
+                    <div className="absolute top-2 right-2">
+                      <Badge variant="secondary" className="text-xs">
+                        {c.type === "multi-video-course"
+                          ? "Course Series"
+                          : "Course"}
+                      </Badge>
+                    </div>
+                  </div>
+                  <CardContent className="space-y-3 p-4">
+                    <div className="flex flex-wrap gap-2">
+                      {c.tags?.slice(0, 3).map((t) => (
+                        <Badge key={t} variant="secondary" className="text-xs">
+                          {t}
+                        </Badge>
+                      ))}
+                    </div>
+                    <div className="flex items-center justify-between">
+                      {c.difficulty && (
+                        <Badge variant="outline" className="text-xs">
+                          {c.difficulty}
+                        </Badge>
+                      )}
+                      {c.duration && (
+                        <div className="flex items-center gap-1 text-xs text-gray-400">
+                          <Clock className="w-3 h-3" />
+                          {c.duration} min
+                        </div>
+                      )}
+                    </div>
+                    {/* Progress indicator if available */}
+                    {c.progress !== undefined && (
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-gray-400">Progress</span>
+                          <span className="text-white">{c.progress}%</span>
+                        </div>
+                        <Progress value={c.progress} className="h-2" />
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        )}
         {courses.length > 6 && (
           <div className="text-center mt-6">
             <Link href="/skills/courses">

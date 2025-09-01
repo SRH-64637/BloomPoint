@@ -38,7 +38,7 @@ const resourceTypes = [
     icon: Video,
     color: "from-purple-500/20 to-pink-500/20",
     features: [
-      "Upload video files (up to 100MB)",
+      "Upload video files (up to 500MB)",
       "Embed YouTube or Vimeo videos",
       "Support for custom embed codes",
       "Perfect for demonstrations and tutorials",
@@ -225,7 +225,3 @@ export default function CreateResourcePage() {
     </main>
   );
 }
-
-
-
-

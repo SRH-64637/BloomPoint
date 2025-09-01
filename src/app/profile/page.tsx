@@ -228,7 +228,7 @@ export default function ProfilePage() {
             </div>
             <CardTitle className="text-white text-xl">{profile.name}</CardTitle>
             <p className="text-gray-300 text-sm">
-              Level {currentLevel} Developer
+              Level {userXP.level} Developer
             </p>
           </CardHeader>
           <CardContent className="space-y-4">

@@ -7,7 +7,6 @@ export interface ICourse extends Document {
   category?: string;
   level: "BEGINNER" | "INTERMEDIATE" | "ADVANCED";
   createdBy: Schema.Types.ObjectId; // Employer
-  projects: Schema.Types.ObjectId[];
 }
 
 const CourseSchema = new Schema<ICourse>(
@@ -21,7 +20,6 @@ const CourseSchema = new Schema<ICourse>(
       default: "BEGINNER",
     },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },
-    projects: [{ type: Schema.Types.ObjectId, ref: "Project" }],
   },
   { timestamps: true }
 );

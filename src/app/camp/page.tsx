@@ -53,6 +53,8 @@ export default function Camp() {
     xpToNextLevel: 100,
     xpProgress: 0,
   });
+  const [savedJobs, setSavedJobs] = useState<any[]>([]);
+  const [savedCourses, setSavedCourses] = useState<any[]>([]);
 
   useEffect(() => {
     if (isLoaded && user) {
@@ -94,6 +96,22 @@ export default function Camp() {
       };
 
       fetchRealXP();
+
+      // Fetch saved jobs and courses
+      const fetchSavedContent = async () => {
+        try {
+          const savedResponse = await fetch("/api/me/saved");
+          if (savedResponse.ok) {
+            const savedData = await savedResponse.json();
+            setSavedJobs(savedData.savedJobs || []);
+            setSavedCourses(savedData.savedCourses || []);
+          }
+        } catch (error) {
+          console.error("Error fetching saved content:", error);
+        }
+      };
+
+      fetchSavedContent();
     }
   }, [isLoaded, user]);
 
@@ -350,35 +368,99 @@ export default function Camp() {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Saved Jobs */}
-              <div className="text-center p-6 bg-black/30 rounded-lg border border-red-500/20">
-                <Target className="w-8 h-8 text-red-400 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-white mb-2">
-                  Saved Jobs
-                </h3>
-                <p className="text-gray-400 text-sm mb-4">
-                  Track your favorite job opportunities
-                </p>
-                <Link href="/jobs">
-                  <Button size="sm" className="bg-red-600 hover:bg-red-700">
-                    Browse Jobs
-                  </Button>
-                </Link>
+              <div className="p-6 bg-black/30 rounded-lg border border-red-500/20">
+                <div className="flex items-center gap-2 mb-4">
+                  <Target className="w-6 h-6 text-red-400" />
+                  <h3 className="text-lg font-semibold text-white">
+                    Saved Jobs
+                  </h3>
+                </div>
+                {savedJobs.length === 0 ? (
+                  <div className="text-center py-4">
+                    <p className="text-gray-400 text-sm mb-3">
+                      No saved jobs yet
+                    </p>
+                    <Link href="/jobs">
+                      <Button size="sm" className="bg-red-600 hover:bg-red-700">
+                        Browse Jobs
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {savedJobs.slice(0, 3).map((job) => (
+                      <div key={job._id} className="p-3 bg-white/5 rounded-lg">
+                        <h4 className="text-white font-medium text-sm">
+                          {job.title}
+                        </h4>
+                        <p className="text-gray-400 text-xs">{job.company}</p>
+                      </div>
+                    ))}
+                    {savedJobs.length > 3 && (
+                      <Link href="/jobs">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full mt-3"
+                        >
+                          View All ({savedJobs.length})
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* Saved Courses */}
-              <div className="text-center p-6 bg-black/30 rounded-lg border border-red-500/20">
-                <GraduationCap className="w-8 h-8 text-red-400 mx-auto mb-3" />
-                <h3 className="text-lg font-semibold text-white mb-2">
-                  Saved Courses
-                </h3>
-                <p className="text-gray-400 text-sm mb-4">
-                  Continue learning from where you left off
-                </p>
-                <Link href="/skills/courses">
-                  <Button size="sm" className="bg-red-600 hover:bg-red-700">
-                    Explore Courses
-                  </Button>
-                </Link>
+              <div className="p-6 bg-black/30 rounded-lg border border-red-500/20">
+                <div className="flex items-center gap-2 mb-4">
+                  <GraduationCap className="w-6 h-6 text-red-400" />
+                  <h3 className="text-lg font-semibold text-white">
+                    Saved Courses
+                  </h3>
+                </div>
+                {savedCourses.length === 0 ? (
+                  <div className="text-center py-4">
+                    <p className="text-gray-400 text-sm mb-3">
+                      No saved courses yet
+                    </p>
+                    <Link href="/skills/courses">
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        Explore Courses
+                      </Button>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {savedCourses.slice(0, 3).map((course) => (
+                      <div
+                        key={course._id}
+                        className="p-3 bg-white/5 rounded-lg"
+                      >
+                        <h4 className="text-white font-medium text-sm">
+                          {course.title}
+                        </h4>
+                        <p className="text-gray-400 text-xs">
+                          {course.difficulty}
+                        </p>
+                      </div>
+                    ))}
+                    {savedCourses.length > 3 && (
+                      <Link href="/skills/courses">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full mt-3"
+                        >
+                          View All ({savedCourses.length})
+                        </Button>
+                      </Link>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>

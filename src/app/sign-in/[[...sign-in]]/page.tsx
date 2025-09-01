@@ -27,8 +27,6 @@ export default function SignInPage() {
               socialButtonsBlockButton:
                 "bg-white/10 border-red-500/30 text-white hover:bg-red-500/20 transition-all duration-300",
               socialButtonsBlockButtonText: "text-white",
-              formFieldInputShowPasswordButtonIcon:
-                "text-gray-400 hover:text-red-400 transition-colors duration-300",
             },
             variables: {
               colorPrimary: "#ef4444",
@@ -37,7 +35,6 @@ export default function SignInPage() {
               colorBackground: "rgba(0, 0, 0, 0.8)",
               colorInputBackground: "rgba(255, 255, 255, 0.05)",
               colorInputText: "#ffffff",
-              colorInputPlaceholderText: "#9ca3af",
               colorNeutral: "#6b7280",
               colorSuccess: "#10b981",
               colorWarning: "#f59e0b",

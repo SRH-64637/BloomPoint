@@ -1,107 +1,113 @@
 import { auth } from "@clerk/nextjs/server";
 import dbConnect from "@/lib/dbConnect";
 import { User } from "@/model/User.models";
+import { Job } from "@/model/Job.models";
+import { Resource } from "@/model/Resource.models";
 
-export interface PermissionCheck {
-  canEdit: boolean;
-  canDelete: boolean;
-  canView: boolean;
-  isOwner: boolean;
-}
-
-/**
- * Check if the current user can edit/delete a resource
- * @param resourceCreatedBy - The ID of the user who created the resource
- * @returns PermissionCheck object with boolean flags
- */
+// Check if user is the creator of a resource
 export async function checkResourcePermissions(
-  resourceCreatedBy: string | any
-): Promise<PermissionCheck> {
+  resourceId: string,
+  resourceType: "job" | "course" | "blog"
+): Promise<{ canEdit: boolean; canDelete: boolean; canRead: boolean }> {
   try {
     const { userId } = await auth();
-
     if (!userId) {
-      return {
-        canEdit: false,
-        canDelete: false,
-        canView: true, // Anyone can view
-        isOwner: false,
-      };
+      return { canEdit: false, canDelete: false, canRead: true };
     }
 
     await dbConnect();
 
-    // Get current user from our database
-    const currentUser = await User.findOne({ clerkId: userId });
-    if (!currentUser) {
-      return {
-        canEdit: false,
-        canDelete: false,
-        canView: true,
-        isOwner: false,
-      };
+    let resource;
+    let creatorField: string;
+
+    switch (resourceType) {
+      case "job":
+        resource = await Job.findById(resourceId);
+        creatorField = "createdBy";
+        break;
+      case "course":
+      case "blog":
+        resource = await Resource.findById(resourceId);
+        creatorField = "createdBy";
+        break;
+      default:
+        return { canEdit: false, canDelete: false, canRead: true };
     }
 
-    // Check if current user is the owner
-    const isOwner = currentUser._id.toString() === resourceCreatedBy.toString();
+    if (!resource) {
+      return { canEdit: false, canDelete: false, canRead: false };
+    }
+
+    // Check if user is the creator
+    const isCreator = resource[creatorField]?.toString() === userId;
+
+    // Check if user is admin
+    const user = await User.findOne({ clerkId: userId });
+    const isAdmin = user?.role === "ADMIN";
 
     return {
-      canEdit: isOwner,
-      canDelete: isOwner,
-      canView: true, // Anyone can view
-      isOwner,
+      canEdit: isCreator || isAdmin,
+      canDelete: isCreator || isAdmin,
+      canRead: true, // Everyone can read
     };
   } catch (error) {
-    console.error("Error checking permissions:", error);
-    return {
-      canEdit: false,
-      canDelete: false,
-      canView: true,
-      isOwner: false,
-    };
+    console.error("Error checking resource permissions:", error);
+    return { canEdit: false, canDelete: false, canRead: true };
   }
 }
 
-/**
- * Check if the current user is an admin
- * @returns boolean
- */
+// Check if user is admin
 export async function isAdmin(): Promise<boolean> {
   try {
     const { userId } = await auth();
-
-    if (!userId) {
-      return false;
-    }
+    if (!userId) return false;
 
     await dbConnect();
-
-    const currentUser = await User.findOne({ clerkId: userId });
-    return currentUser?.role === "ADMIN";
+    const user = await User.findOne({ clerkId: userId });
+    return user?.role === "ADMIN";
   } catch (error) {
     console.error("Error checking admin status:", error);
     return false;
   }
 }
 
-/**
- * Check if the current user is an employer
- * @returns boolean
- */
+// Check if user is employer
 export async function isEmployer(): Promise<boolean> {
   try {
     const { userId } = await auth();
-
-    if (!userId) {
-      return false;
-    }
+    if (!userId) return false;
 
     await dbConnect();
-
-    const currentUser = await User.findOne({ clerkId: userId });
-    return currentUser?.role === "EMPLOYER";
+    const user = await User.findOne({ clerkId: userId });
+    return user?.role === "EMPLOYER";
   } catch (error) {
     console.error("Error checking employer status:", error);
+    return false;
+  }
+}
+
+// Check if user can create resources
+export async function canCreateResource(
+  resourceType: "job" | "course" | "blog"
+): Promise<boolean> {
+  try {
+    const { userId } = await auth();
+    if (!userId) return false;
+
+    await dbConnect();
+    const user = await User.findOne({ clerkId: userId });
+
+    switch (resourceType) {
+      case "job":
+        return user?.role === "EMPLOYER" || user?.role === "ADMIN";
+      case "course":
+      case "blog":
+        return true; // Any authenticated user can create courses/blogs
+      default:
+        return false;
+    }
+  } catch (error) {
+    console.error("Error checking create permissions:", error);
     return false;
   }
 }

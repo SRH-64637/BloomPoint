@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import dbConnect from "@/lib/dbConnect";
 import { Resource } from "@/model/Resource.models";
+import { User } from "@/model/User.models";
 import { auth } from "@clerk/nextjs/server";
 
 // Add CORS headers
@@ -71,6 +72,7 @@ export async function GET(request: Request) {
 
     const skip = (page - 1) * limit;
     const resources = await Resource.find(filter)
+      .populate("createdBy", "name email")
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -173,6 +175,12 @@ export async function POST(request: Request) {
       }
     }
 
+    // Get or create the user in our database
+    let mongoUser = await User.findOne({ clerkId: userId });
+    if (!mongoUser) {
+      mongoUser = await User.create({ clerkId: userId });
+    }
+
     const resource = await Resource.create({
       title,
       description,
@@ -185,7 +193,7 @@ export async function POST(request: Request) {
       difficulty,
       duration,
       videoLectures: type === "multi-video-course" ? videoLectures : undefined,
-      createdBy: userId, // This is now the Clerk user ID
+      createdBy: mongoUser._id, // Use MongoDB ObjectId
     });
 
     return NextResponse.json(

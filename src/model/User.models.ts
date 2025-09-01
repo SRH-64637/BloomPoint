@@ -8,6 +8,13 @@ export interface IUser extends Document {
   email?: string; // Optional, since Clerk manages it
   name?: string;
   role: UserRole;
+  xp?: number; // gamification points
+  savedJobs?: Schema.Types.ObjectId[]; // refs to Jobs
+  savedCourses?: Schema.Types.ObjectId[]; // refs to Courses
+  progress?: {
+    courses?: { [courseId: string]: number }; // courseId: progress percentage
+    jobs?: { [jobId: string]: string }; // jobId: status
+  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -21,6 +28,13 @@ const UserSchema: Schema<IUser> = new Schema(
       type: String,
       enum: ["USER", "EMPLOYER", "ADMIN"],
       default: "USER",
+    },
+    xp: { type: Number, default: 0 },
+    savedJobs: [{ type: Schema.Types.ObjectId, ref: "Job" }],
+    savedCourses: [{ type: Schema.Types.ObjectId, ref: "Resource" }],
+    progress: {
+      courses: { type: Map, of: Number, default: {} },
+      jobs: { type: Map, of: String, default: {} },
     },
   },
   { timestamps: true }

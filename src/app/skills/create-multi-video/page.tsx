@@ -75,9 +75,9 @@ export default function CreateMultiVideoCourse() {
     file: File,
     lectureIndex: number
   ): Promise<string> => {
-    // Validate file size (100MB limit)
-    if (file.size > 100 * 1024 * 1024) {
-      throw new Error(`File size too large. Maximum size is 100MB.`);
+    // Validate file size (500MB limit)
+    if (file.size > 500 * 1024 * 1024) {
+      throw new Error(`File size too large. Maximum size is 500MB.`);
     }
 
     const formData = new FormData();
@@ -505,7 +505,8 @@ export default function CreateMultiVideoCourse() {
                           )}
                         </div>
                         <p className="text-xs text-gray-400 mt-1">
-                          Supported formats: MP4, MOV, AVI. Max size: 100MB
+                          Supported formats: MP4, MOV, AVI, WebM, MKV, FLV. Max
+                          size: 500MB
                         </p>
                       </div>
                     ) : (
