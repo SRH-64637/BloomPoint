@@ -407,14 +407,14 @@ export default function WellnessPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-white">
                 <PenLine className="w-5 h-5 text-sky-300" />
-                Journaling
+                Reminders
               </CardTitle>
             </CardHeader>
             <CardContent>
               <textarea
                 value={entry}
                 onChange={(e) => setEntry(e.target.value)}
-                placeholder="Let it out… this is your safe space."
+                placeholder="Write it out… this is your safe space."
                 className="w-full min-h-40 p-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-400 resize-none focus:outline-none focus:ring-2 focus:ring-sky-500 shadow-[0_6px_30px_rgba(0,0,0,0.15)]"
               />
               <div className="mt-4 flex items-center gap-3">
@@ -480,7 +480,7 @@ export default function WellnessPage() {
                   <div className="text-center text-gray-400 py-4">
                     {isLoading
                       ? "Loading..."
-                      : "No wellness logs yet. Start journaling above!"}
+                      : "Great job! You’ve completed all your chores for today!"}
                   </div>
                 )}
               </div>
