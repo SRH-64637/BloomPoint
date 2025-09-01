@@ -37,7 +37,7 @@ export interface IResource extends Document {
   progress?: number; // 0-100 for user progress tracking
 
   // References
-  createdBy: string; // Clerk user ID
+  createdBy: Types.ObjectId;
 
   // Engagement metrics
   views: number;
@@ -162,7 +162,8 @@ const ResourceSchema = new Schema<IResource>(
 
     // References
     createdBy: {
-      type: String, // Clerk user ID
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
     },
 

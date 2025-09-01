@@ -1,17 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useUser } from "@clerk/nextjs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { 
-  User, 
-  Trophy, 
-  Star, 
-  Target, 
-  TrendingUp, 
-  Edit, 
+import {
+  User,
+  Trophy,
+  Star,
+  Target,
+  TrendingUp,
+  Edit,
   Settings,
   Award,
   Calendar,
@@ -20,7 +21,7 @@ import {
   Phone,
   Github,
   Linkedin,
-  Globe
+  Globe,
 } from "lucide-react";
 
 interface Badge {
@@ -43,17 +44,26 @@ interface Achievement {
 }
 
 export default function ProfilePage() {
+  const { user, isLoaded } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [profile, setProfile] = useState({
-    name: "Alex Johnson",
-    email: "alex.johnson@email.com",
-    location: "San Francisco, CA",
-    bio: "Passionate developer focused on creating meaningful user experiences. Love learning new technologies and contributing to open source projects.",
-    phone: "+1 (555) 123-4567",
-    github: "alexjohnson",
-    linkedin: "alexjohnson",
-    website: "alexjohnson.dev"
+    name: "",
+    email: "",
+    location: "Location not set",
+    bio: "Bio not set",
+    phone: "Phone not set",
+    github: "",
+    linkedin: "",
+    website: "",
   });
+  const [userXP, setUserXP] = useState({
+    xp: 0,
+    level: 1,
+    totalXP: 0,
+    xpToNextLevel: 100,
+    xpProgress: 0,
+  });
+  const [loading, setLoading] = useState(true);
 
   const [badges] = useState<Badge[]>([
     {
@@ -62,7 +72,7 @@ export default function ProfilePage() {
       description: "Complete your first task",
       icon: "🎯",
       color: "bg-blue-500",
-      unlockedAt: "2024-01-01"
+      unlockedAt: "2024-01-01",
     },
     {
       id: "2",
@@ -70,7 +80,7 @@ export default function ProfilePage() {
       description: "Maintain a 7-day streak",
       icon: "🔥",
       color: "bg-orange-500",
-      unlockedAt: "2024-01-15"
+      unlockedAt: "2024-01-15",
     },
     {
       id: "3",
@@ -78,7 +88,7 @@ export default function ProfilePage() {
       description: "Help 10 other users",
       icon: "🤝",
       color: "bg-green-500",
-      unlockedAt: "2024-01-20"
+      unlockedAt: "2024-01-20",
     },
     {
       id: "4",
@@ -86,8 +96,8 @@ export default function ProfilePage() {
       description: "Complete 50 learning modules",
       icon: "📚",
       color: "bg-purple-500",
-      unlockedAt: "2024-01-25"
-    }
+      unlockedAt: "2024-01-25",
+    },
   ]);
 
   const [achievements] = useState<Achievement[]>([
@@ -98,7 +108,7 @@ export default function ProfilePage() {
       xp: 500,
       completed: false,
       progress: 67,
-      target: 100
+      target: 100,
     },
     {
       id: "2",
@@ -107,7 +117,7 @@ export default function ProfilePage() {
       xp: 300,
       completed: false,
       progress: 23,
-      target: 30
+      target: 30,
     },
     {
       id: "3",
@@ -116,28 +126,88 @@ export default function ProfilePage() {
       xp: 400,
       completed: false,
       progress: 31,
-      target: 50
-    }
+      target: 50,
+    },
   ]);
 
-  const currentLevel = 15;
-  const currentXP = 2340;
-  const xpToNextLevel = 3000;
-  const xpProgress = (currentXP / xpToNextLevel) * 100;
+  // Use real XP data from state
 
   const totalBadges = badges.length;
   const unlockedBadges = badges.length;
   const totalAchievements = achievements.length;
-  const completedAchievements = achievements.filter(a => a.completed).length;
+  const completedAchievements = achievements.filter((a) => a.completed).length;
+
+  // Fetch user data and XP
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!isLoaded || !user) return;
+
+      try {
+        // Fetch user profile from our API
+        const profileResponse = await fetch("/api/me");
+        if (profileResponse.ok) {
+          const profileData = await profileResponse.json();
+          setProfile((prev) => ({
+            ...prev,
+            name:
+              profileData.name ||
+              `${user.firstName || ""} ${user.lastName || ""}`.trim() ||
+              "User",
+            email:
+              profileData.email || user.emailAddresses[0]?.emailAddress || "",
+          }));
+        }
+
+        // Fetch user XP
+        const xpResponse = await fetch("/api/me/xp");
+        if (xpResponse.ok) {
+          const xpData = await xpResponse.json();
+          setUserXP(xpData);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [isLoaded, user]);
 
   const handleProfileUpdate = (field: string, value: string) => {
-    setProfile(prev => ({ ...prev, [field]: value }));
+    setProfile((prev) => ({ ...prev, [field]: value }));
   };
 
   const saveProfile = () => {
     setIsEditing(false);
     // Here you would typically save to a database
   };
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-white text-xl">
+          Please sign in to view your profile.
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-white text-xl">Loading profile...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-6 py-8 pt-24">
@@ -151,30 +221,43 @@ export default function ProfilePage() {
         <Card className="bg-white/10 backdrop-blur-md border-white/20">
           <CardHeader className="text-center">
             <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
-              {profile.name.split(' ').map(n => n[0]).join('')}
+              {profile.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("")}
             </div>
             <CardTitle className="text-white text-xl">{profile.name}</CardTitle>
-            <p className="text-gray-300 text-sm">Level {currentLevel} Developer</p>
+            <p className="text-gray-300 text-sm">
+              Level {currentLevel} Developer
+            </p>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* XP Progress */}
             <div className="text-center">
-              <div className="text-2xl font-bold text-white mb-2">{currentXP} XP</div>
-              <div className="text-sm text-gray-300 mb-2">Level {currentLevel}</div>
-              <Progress value={xpProgress} className="h-2 mb-2" />
+              <div className="text-2xl font-bold text-white mb-2">
+                {userXP.xp} XP
+              </div>
+              <div className="text-sm text-gray-300 mb-2">
+                Level {userXP.level}
+              </div>
+              <Progress value={userXP.xpProgress} className="h-2 mb-2" />
               <div className="text-xs text-gray-400">
-                {xpToNextLevel - currentXP} XP to next level
+                {userXP.xpToNextLevel - userXP.xp} XP to next level
               </div>
             </div>
 
             {/* Quick Stats */}
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-white/20">
               <div className="text-center">
-                <div className="text-lg font-bold text-white">{totalBadges}</div>
+                <div className="text-lg font-bold text-white">
+                  {totalBadges}
+                </div>
                 <div className="text-xs text-gray-300">Badges</div>
               </div>
               <div className="text-center">
-                <div className="text-lg font-bold text-white">{completedAchievements}</div>
+                <div className="text-lg font-bold text-white">
+                  {completedAchievements}
+                </div>
                 <div className="text-xs text-gray-300">Achievements</div>
               </div>
             </div>
@@ -202,33 +285,46 @@ export default function ProfilePage() {
             {isEditing ? (
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Name
+                  </label>
                   <input
                     type="text"
                     value={profile.name}
-                    onChange={(e) => handleProfileUpdate('name', e.target.value)}
+                    onChange={(e) =>
+                      handleProfileUpdate("name", e.target.value)
+                    }
                     className="w-full p-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Bio</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Bio
+                  </label>
                   <textarea
                     value={profile.bio}
-                    onChange={(e) => handleProfileUpdate('bio', e.target.value)}
+                    onChange={(e) => handleProfileUpdate("bio", e.target.value)}
                     rows={3}
                     className="w-full p-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Location</label>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Location
+                  </label>
                   <input
                     type="text"
                     value={profile.location}
-                    onChange={(e) => handleProfileUpdate('location', e.target.value)}
+                    onChange={(e) =>
+                      handleProfileUpdate("location", e.target.value)
+                    }
                     className="w-full p-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
-                <Button onClick={saveProfile} className="w-full bg-green-600 hover:bg-green-700">
+                <Button
+                  onClick={saveProfile}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
                   Save Changes
                 </Button>
               </div>
@@ -247,20 +343,28 @@ export default function ProfilePage() {
                   <span className="text-gray-300">{profile.phone}</span>
                 </div>
                 <div className="pt-4 border-t border-white/20">
-                  <p className="text-gray-300 text-sm leading-relaxed">{profile.bio}</p>
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    {profile.bio}
+                  </p>
                 </div>
-                
+
                 {/* Social Links */}
                 <div className="pt-4 border-t border-white/20">
-                  <h4 className="text-sm font-medium text-white mb-3">Social Links</h4>
+                  <h4 className="text-sm font-medium text-white mb-3">
+                    Social Links
+                  </h4>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <Github className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-300">github.com/{profile.github}</span>
+                      <span className="text-gray-300">
+                        github.com/{profile.github}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Linkedin className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-300">linkedin.com/in/{profile.linkedin}</span>
+                      <span className="text-gray-300">
+                        linkedin.com/in/{profile.linkedin}
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Globe className="w-4 h-4 text-gray-400" />
@@ -296,8 +400,12 @@ export default function ProfilePage() {
                     title={badge.description}
                   >
                     <div className="text-2xl mb-2">{badge.icon}</div>
-                    <div className="text-xs font-medium text-white mb-1">{badge.name}</div>
-                    <div className="text-xs text-gray-400">{badge.unlockedAt}</div>
+                    <div className="text-xs font-medium text-white mb-1">
+                      {badge.name}
+                    </div>
+                    <div className="text-xs text-gray-400">
+                      {badge.unlockedAt}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -311,14 +419,28 @@ export default function ProfilePage() {
               </h4>
               <div className="space-y-3">
                 {achievements.map((achievement) => (
-                  <div key={achievement.id} className="p-3 bg-white/5 rounded-lg border border-white/20">
+                  <div
+                    key={achievement.id}
+                    className="p-3 bg-white/5 rounded-lg border border-white/20"
+                  >
                     <div className="flex items-center justify-between mb-2">
-                      <div className="text-sm font-medium text-white">{achievement.name}</div>
-                      <div className="text-xs text-gray-400">{achievement.xp} XP</div>
+                      <div className="text-sm font-medium text-white">
+                        {achievement.name}
+                      </div>
+                      <div className="text-xs text-gray-400">
+                        {achievement.xp} XP
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-300 mb-2">{achievement.description}</p>
+                    <p className="text-xs text-gray-300 mb-2">
+                      {achievement.description}
+                    </p>
                     <div className="flex items-center gap-2">
-                      <Progress value={(achievement.progress / achievement.target) * 100} className="flex-1 h-2" />
+                      <Progress
+                        value={
+                          (achievement.progress / achievement.target) * 100
+                        }
+                        className="flex-1 h-2"
+                      />
                       <span className="text-xs text-gray-400">
                         {achievement.progress}/{achievement.target}
                       </span>

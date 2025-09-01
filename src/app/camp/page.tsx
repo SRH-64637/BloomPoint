@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUser, SignOutButton } from "@clerk/nextjs";
+import Link from "next/link";
 import {
   Home,
   Target,
@@ -17,6 +18,8 @@ import {
   User,
   Settings,
   LogOut,
+  BookOpen,
+  GraduationCap,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -43,6 +46,13 @@ export default function Camp() {
   const [showProfile, setShowProfile] = useState(false);
   const [userStats, setUserStats] = useState(DEFAULT_USER_STATS);
   const [xpProgress, setXpProgress] = useState(0);
+  const [realUserXP, setRealUserXP] = useState({
+    xp: 0,
+    level: 1,
+    totalXP: 0,
+    xpToNextLevel: 100,
+    xpProgress: 0,
+  });
 
   useEffect(() => {
     if (isLoaded && user) {
@@ -69,6 +79,21 @@ export default function Camp() {
           JSON.stringify(newUserStats)
         );
       }
+
+      // Fetch real XP data from API
+      const fetchRealXP = async () => {
+        try {
+          const xpResponse = await fetch("/api/me/xp");
+          if (xpResponse.ok) {
+            const xpData = await xpResponse.json();
+            setRealUserXP(xpData);
+          }
+        } catch (error) {
+          console.error("Error fetching real XP:", error);
+        }
+      };
+
+      fetchRealXP();
     }
   }, [isLoaded, user]);
 
@@ -231,12 +256,15 @@ export default function Camp() {
                 {/* Level & XP */}
                 <div className="text-center">
                   <div className="text-2xl font-bold text-red-400">
-                    Level {userStats.level}
+                    Level {realUserXP.level}
                   </div>
                   <div className="text-sm text-gray-400">
-                    XP: {userStats.xp}/{userStats.xpToNext}
+                    XP: {realUserXP.xp}/{realUserXP.xpToNextLevel}
                   </div>
-                  <Progress value={xpProgress} className="w-32 h-2 mt-1" />
+                  <Progress
+                    value={realUserXP.xpProgress}
+                    className="w-32 h-2 mt-1"
+                  />
                 </div>
 
                 {/* Daily Streak */}
@@ -304,6 +332,58 @@ export default function Camp() {
           </motion.div>
         ))}
       </div>
+
+      {/* Saved Content Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.6 }}
+        className="mb-8"
+      >
+        <Card className="bg-black/20 backdrop-blur-md border-red-500/20 shadow-lg">
+          <CardHeader>
+            <CardTitle className="text-white flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-red-400" />
+              Saved Content
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Saved Jobs */}
+              <div className="text-center p-6 bg-black/30 rounded-lg border border-red-500/20">
+                <Target className="w-8 h-8 text-red-400 mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  Saved Jobs
+                </h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Track your favorite job opportunities
+                </p>
+                <Link href="/jobs">
+                  <Button size="sm" className="bg-red-600 hover:bg-red-700">
+                    Browse Jobs
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Saved Courses */}
+              <div className="text-center p-6 bg-black/30 rounded-lg border border-red-500/20">
+                <GraduationCap className="w-8 h-8 text-red-400 mx-auto mb-3" />
+                <h3 className="text-lg font-semibold text-white mb-2">
+                  Saved Courses
+                </h3>
+                <p className="text-gray-400 text-sm mb-4">
+                  Continue learning from where you left off
+                </p>
+                <Link href="/skills/courses">
+                  <Button size="sm" className="bg-red-600 hover:bg-red-700">
+                    Explore Courses
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Daily Challenge Button */}
       <motion.div
@@ -444,7 +524,7 @@ export default function Camp() {
                       {userStats.rank}
                     </p>
                     <p className="text-gray-400 text-sm">
-                      Level {userStats.level}
+                      Level {realUserXP.level}
                     </p>
                   </div>
                 </div>
@@ -453,7 +533,7 @@ export default function Camp() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-black/30 rounded-lg p-4 text-center">
                     <div className="text-2xl font-bold text-red-400">
-                      {userStats.totalXP}
+                      {realUserXP.totalXP}
                     </div>
                     <div className="text-sm text-gray-400">Total XP</div>
                   </div>

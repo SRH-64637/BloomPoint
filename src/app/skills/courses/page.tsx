@@ -13,6 +13,8 @@ import {
   GraduationCap,
   Clock,
   Star,
+  Plus,
+  BookOpen,
 } from "lucide-react";
 
 interface Resource {
@@ -253,13 +255,26 @@ export default function CoursesPage() {
           </div>
         )}
 
-        {/* Create Course Button */}
-        <div className="text-center mt-12">
-          <Link href="/skills/create">
-            <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
-              Create New Course
-            </Button>
-          </Link>
+        {/* Action Buttons */}
+        <div className="text-center mt-12 space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/skills/my-courses">
+              <Button
+                variant="outline"
+                size="lg"
+                className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
+                My Courses
+              </Button>
+            </Link>
+            <Link href="/skills/create">
+              <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
+                <Plus className="w-4 h-4 mr-2" />
+                Create New Course
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -49,6 +49,33 @@ export async function POST(request: Request) {
       status: "PENDING",
     });
 
+    // Add XP for applying to a job
+    try {
+      const xpResponse = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
+        }/api/me/xp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            amount: 50, // 50 XP for applying to a job
+            action: "job_application",
+          }),
+        }
+      );
+
+      if (xpResponse.ok) {
+        const xpData = await xpResponse.json();
+        console.log("XP added for job application:", xpData);
+      }
+    } catch (xpError) {
+      console.error("Failed to add XP for job application:", xpError);
+      // Don't fail the job application if XP addition fails
+    }
+
     return NextResponse.json(
       { message: "Application submitted successfully", application },
       { status: 201 }
