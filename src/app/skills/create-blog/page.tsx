@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,9 @@ import {
 
 export default function CreateBlogPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("edit");
+  
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -30,6 +33,36 @@ export default function CreateBlogPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Fetch blog data if in edit mode
+  useEffect(() => {
+    if (editId) {
+      setIsEditing(true);
+      fetchBlogData(editId);
+    }
+  }, [editId]);
+
+  const fetchBlogData = async (id: string) => {
+    try {
+      const response = await fetch(`/api/resources/${id}`);
+      if (response.ok) {
+        const blog = await response.json();
+        setForm({
+          title: blog.title || "",
+          description: blog.description || "",
+          content: blog.content || "",
+          tags: blog.tags || [],
+          difficulty: blog.difficulty || "beginner",
+          featured: blog.featured || false,
+        });
+      } else {
+        setError("Failed to load blog data for editing");
+      }
+    } catch (error) {
+      setError("Error loading blog data");
+    }
+  };
 
   const addTag = () => {
     const tag = tagsInput.trim().toLowerCase();
@@ -82,8 +115,16 @@ export default function CreateBlogPage() {
         featured: form.featured,
       };
 
-      const res = await fetch("/api/resources", {
-        method: "POST",
+      let url = "/api/resources";
+      let method = "POST";
+      
+      if (isEditing && editId) {
+        url = `/api/resources/${editId}`;
+        method = "PUT";
+      }
+
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
@@ -92,22 +133,27 @@ export default function CreateBlogPage() {
 
       if (!res.ok) {
         if (res.status === 401) {
-          throw new Error("Please log in to create a blog.");
+          throw new Error("Please log in to create/edit a blog.");
         } else if (res.status === 400) {
           throw new Error(
             `Invalid data: ${data.error || "Please check your input"}`
           );
+        } else if (res.status === 403) {
+          throw new Error("You don't have permission to edit this blog.");
         } else {
           throw new Error(
-            data?.error || `Failed to create blog (status ${res.status})`
+            data?.error || `Failed to ${isEditing ? 'update' : 'create'} blog (status ${res.status})`
           );
         }
       }
 
-      setSuccess("Blog created successfully! Redirecting...");
-      setTimeout(() => {
-        router.push(`/skills/blogs/${data.resource._id}`);
-      }, 1500);
+      setSuccess(isEditing ? "Blog updated successfully!" : "Blog created successfully! Redirecting...");
+      
+      if (!isEditing) {
+        setTimeout(() => {
+          router.push(`/skills/blogs/${data.resource._id}`);
+        }, 1500);
+      }
     } catch (e: any) {
       setError(e?.message || "Something went wrong. Please try again.");
     } finally {
@@ -121,10 +167,10 @@ export default function CreateBlogPage() {
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-white mb-2 flex items-center gap-2">
             <FileText className="w-8 h-8" />
-            Create Blog Post
+            {isEditing ? "Edit Blog Post" : "Create Blog Post"}
           </h1>
           <p className="text-gray-400">
-            Share your knowledge and insights with the community
+            {isEditing ? "Update your blog post" : "Share your knowledge and insights with the community"}
           </p>
         </div>
 
@@ -285,12 +331,12 @@ export default function CreateBlogPage() {
             {submitting ? (
               <>
                 <Loader2 size={18} className="animate-spin" />
-                Creating Blog...
+                {isEditing ? "Updating Blog..." : "Creating Blog..."}
               </>
             ) : (
               <>
                 <FileText size={18} />
-                Create Blog Post
+                {isEditing ? "Update Blog Post" : "Create Blog Post"}
               </>
             )}
           </Button>
@@ -299,7 +345,3 @@ export default function CreateBlogPage() {
     </main>
   );
 }
-
-
-
-

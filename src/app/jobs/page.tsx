@@ -19,6 +19,7 @@ import {
   ExternalLink,
   TrendingUp,
 } from "lucide-react";
+import { useUser } from "@clerk/nextjs"; // ✅ use Clerk instead of custom hook
 
 interface Job {
   _id: string;
@@ -33,7 +34,8 @@ interface Job {
   level: string;
   remote?: boolean;
   saved?: boolean;
-  employerId?: {
+  employerId?: string; // ✅ Clerk userId
+  employerProfile?: {
     firstName: string;
     lastName: string;
     company: string;
@@ -41,6 +43,7 @@ interface Job {
 }
 
 export default function JobsPage() {
+  const { user, isLoaded } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -67,7 +70,7 @@ export default function JobsPage() {
             ...job,
             saved: false,
             company:
-              job.employerId?.company || job.company || "Unknown Company",
+              job.employerProfile?.company || job.company || "Unknown Company",
             posted: formatDate(job.createdAt),
           }))
         );
@@ -390,42 +393,50 @@ export default function JobsPage() {
                         )}
                       </Button>
 
-                      <Link href={`/jobs/${job._id}/edit`}>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="border-white/20"
-                        >
-                          Edit
-                        </Button>
-                      </Link>
+                      {/* ✅ Only employer (job creator) can edit/delete */}
+                      {isLoaded && user?.id === job.employerId && (
+                        <>
+                          <Link href={`/jobs/${job._id}/edit`}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="border-white/20"
+                            >
+                              Edit
+                            </Button>
+                          </Link>
 
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-red-400/40 text-red-300 hover:bg-red-500/20"
-                        onClick={async () => {
-                          if (!confirm("Delete this job?")) return;
-                          try {
-                            const res = await fetch(`/api/jobs/${job._id}`, {
-                              method: "DELETE",
-                            });
-                            if (res.ok) {
-                              setJobs((prev) =>
-                                prev.filter((j) => j._id !== job._id)
-                              );
-                            } else {
-                              const e = await res.json();
-                              alert(e.error || "Failed to delete job");
-                            }
-                          } catch (e) {
-                            console.error(e);
-                            alert("Failed to delete job");
-                          }
-                        }}
-                      >
-                        Delete
-                      </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-red-400/40 text-red-300 hover:bg-red-500/20"
+                            onClick={async () => {
+                              if (!confirm("Delete this job?")) return;
+                              try {
+                                const res = await fetch(
+                                  `/api/jobs/${job._id}`,
+                                  {
+                                    method: "DELETE",
+                                  }
+                                );
+                                if (res.ok) {
+                                  setJobs((prev) =>
+                                    prev.filter((j) => j._id !== job._id)
+                                  );
+                                } else {
+                                  const e = await res.json();
+                                  alert(e.error || "Failed to delete job");
+                                }
+                              } catch (e) {
+                                console.error(e);
+                                alert("Failed to delete job");
+                              }
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </>
+                      )}
 
                       <Button
                         size="sm"

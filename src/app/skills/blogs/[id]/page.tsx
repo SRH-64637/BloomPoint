@@ -11,19 +11,23 @@ import {
   Clock,
   BookOpen,
   ChevronRight,
-  ExternalLink,
+  Edit,
 } from "lucide-react";
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
 
 type PageProps = {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 };
 
 export default async function BlogDetail({ params }: PageProps) {
-  const { id } = await params;
+  const { id } = params;
   await dbConnect();
 
   const resource = (await Resource.findById(id).lean()) as any;
+
+  // Get current user from Clerk
+  const { userId } = await auth();
 
   if (!resource || resource.type !== "blog") {
     return (
@@ -51,6 +55,9 @@ export default async function BlogDetail({ params }: PageProps) {
     });
   };
 
+  // Check if current user is the creator of this blog
+  const isCreator = userId && resource.createdBy === userId;
+
   return (
     <main className="min-h-screen p-6 pt-24 bg-gradient-to-br from-black/95 to-gray-900/95">
       <div className="mx-auto max-w-4xl">
@@ -64,9 +71,22 @@ export default async function BlogDetail({ params }: PageProps) {
 
         {/* Blog Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-4">
-            {resource.title}
-          </h1>
+          <div className="flex justify-between items-start">
+            <h1 className="text-4xl font-bold text-white mb-4">
+              {resource.title}
+            </h1>
+            
+            {/* Edit Button - Only show for the creator */}
+            {isCreator && (
+              <Link href={`/skills/create-blog?edit=${resource._id}`}>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <Edit className="w-4 h-4" />
+                  Edit Blog
+                </Button>
+              </Link>
+            )}
+          </div>
+          
           <p className="text-lg text-gray-300 mb-6">{resource.description}</p>
 
           <div className="flex flex-wrap gap-4 items-center text-sm text-gray-400">
@@ -193,6 +213,16 @@ export default async function BlogDetail({ params }: PageProps) {
                     Create Blog
                   </Link>
                 </Button>
+                
+                {/* Edit button in sidebar too - only for creator */}
+                {isCreator && (
+                  <Button variant="outline" className="w-full" asChild>
+                    <Link href={`/skills/create-blog?edit=${resource._id}`}>
+                      <Edit className="w-4 h-4 mr-2" />
+                      Edit This Blog
+                    </Link>
+                  </Button>
+                )}
               </CardContent>
             </Card>
           </div>
