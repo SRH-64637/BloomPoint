@@ -20,6 +20,10 @@ import {
   LogOut,
   BookOpen,
   GraduationCap,
+  Gamepad2,
+  Medal,
+  Flame,
+  Heart,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,7 +36,7 @@ const DEFAULT_USER_STATS = {
   xp: 0,
   xpToNext: 100, // XP needed for level 2
   dailyStreak: 0,
-  avatar: "🎮",
+  avatar: "Gamepad2",
   username: "New Player",
   achievements: 0,
   totalXP: 0,
@@ -67,7 +71,7 @@ export default function Camp() {
         const newUserStats = {
           ...DEFAULT_USER_STATS,
           username: user.firstName || user.username || "Player",
-          avatar: "🎮",
+          avatar: "Gamepad2",
           xp: 50, // Signup bonus XP
           totalXP: 50,
           hasCompletedSignup: true,
@@ -197,11 +201,11 @@ export default function Camp() {
   };
 
   const achievements = [
-    { name: "First Steps", icon: "🥇", unlocked: userStats.hasCompletedSignup },
-    { name: "Week Warrior", icon: "🔥", unlocked: userStats.dailyStreak >= 7 },
-    { name: "Task Master", icon: "⚡", unlocked: userStats.totalXP >= 1000 },
-    { name: "Social Butterfly", icon: "🦋", unlocked: false },
-    { name: "Wellness Guru", icon: "🧘", unlocked: false },
+    { name: "First Steps", icon: "Medal", unlocked: userStats.hasCompletedSignup },
+    { name: "Week Warrior", icon: "Flame", unlocked: userStats.dailyStreak >= 7 },
+    { name: "Task Master", icon: "Zap", unlocked: userStats.totalXP >= 1000 },
+    { name: "Social Butterfly", icon: "Users", unlocked: false },
+    { name: "Wellness Guru", icon: "Heart", unlocked: false },
   ];
 
   if (!isLoaded) {
@@ -237,7 +241,7 @@ export default function Camp() {
                   className="text-4xl cursor-pointer hover:scale-110 transition-transform"
                   onClick={() => setShowProfile(true)}
                 >
-                  {userStats.avatar}
+                  <Gamepad2 className="w-12 h-12 text-red-400" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold text-white">
@@ -246,7 +250,9 @@ export default function Camp() {
                   <p className="text-gray-300">Your game home base awaits</p>
                   {!userStats.hasCompletedSignup && (
                     <p className="text-green-400 text-sm mt-1">
-                      🎉 +50 XP for joining BloomPoint!
+                      <span className="inline-flex items-center gap-1">
+                        <span>🎉</span> +50 XP for joining BloomPoint!
+                      </span>
                     </p>
                   )}
                 </div>
@@ -515,7 +521,9 @@ export default function Camp() {
               <div className="space-y-6">
                 {/* Avatar and Basic Info */}
                 <div className="flex items-center space-x-4">
-                  <div className="text-6xl">{userStats.avatar}</div>
+                  <div className="text-6xl">
+                    <Gamepad2 className="w-16 h-16 text-red-400" />
+                  </div>
                   <div>
                     <h3 className="text-xl font-bold text-white">
                       {userStats.username}
@@ -560,7 +568,13 @@ export default function Camp() {
                             : "bg-gray-500/20"
                         }`}
                       >
-                        <span className="text-2xl">{achievement.icon}</span>
+                        <div className="text-2xl">
+                          {achievement.icon === "Medal" && <Medal className="w-6 h-6 text-yellow-400" />}
+                          {achievement.icon === "Flame" && <Flame className="w-6 h-6 text-orange-400" />}
+                          {achievement.icon === "Zap" && <Zap className="w-6 h-6 text-blue-400" />}
+                          {achievement.icon === "Users" && <Users className="w-6 h-6 text-green-400" />}
+                          {achievement.icon === "Heart" && <Heart className="w-6 h-6 text-pink-400" />}
+                        </div>
                         <span
                           className={`text-sm ${
                             achievement.unlocked

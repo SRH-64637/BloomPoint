@@ -41,8 +41,7 @@ const JobSchema = new Schema<IJob>(
 
 export const Job = models.Job || model<IJob>("Job", JobSchema);
 
-// ... rest of your JobApplication code remains the same
-
+// 
 //
 // JOB APPLICATION
 //

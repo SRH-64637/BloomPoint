@@ -43,7 +43,7 @@ export async function checkResourcePermissions(
     }
 
     // Check if current user is the owner
-    const isOwner = currentUser._id.toString() === resourceCreatedBy.toString();
+    const isOwner = (currentUser._id as string).toString() === resourceCreatedBy.toString();
 
     return {
       canEdit: isOwner,

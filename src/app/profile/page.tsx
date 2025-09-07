@@ -22,6 +22,9 @@ import {
   Github,
   Linkedin,
   Globe,
+  Flame,
+  HandHeart,
+  BookOpen,
 } from "lucide-react";
 
 interface Badge {
@@ -70,7 +73,7 @@ export default function ProfilePage() {
       id: "1",
       name: "First Steps",
       description: "Complete your first task",
-      icon: "🎯",
+      icon: "Target",
       color: "bg-blue-500",
       unlockedAt: "2024-01-01",
     },
@@ -78,7 +81,7 @@ export default function ProfilePage() {
       id: "2",
       name: "Streak Master",
       description: "Maintain a 7-day streak",
-      icon: "🔥",
+      icon: "Flame",
       color: "bg-orange-500",
       unlockedAt: "2024-01-15",
     },
@@ -86,7 +89,7 @@ export default function ProfilePage() {
       id: "3",
       name: "Community Helper",
       description: "Help 10 other users",
-      icon: "🤝",
+      icon: "HandHeart",
       color: "bg-green-500",
       unlockedAt: "2024-01-20",
     },
@@ -94,7 +97,7 @@ export default function ProfilePage() {
       id: "4",
       name: "Knowledge Seeker",
       description: "Complete 50 learning modules",
-      icon: "📚",
+      icon: "BookOpen",
       color: "bg-purple-500",
       unlockedAt: "2024-01-25",
     },
@@ -228,7 +231,7 @@ export default function ProfilePage() {
             </div>
             <CardTitle className="text-white text-xl">{profile.name}</CardTitle>
             <p className="text-gray-300 text-sm">
-              Level {currentLevel} Developer
+              Level {userXP.level} Developer
             </p>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -399,7 +402,12 @@ export default function ProfilePage() {
                     className="text-center p-3 bg-white/5 rounded-lg border border-white/20"
                     title={badge.description}
                   >
-                    <div className="text-2xl mb-2">{badge.icon}</div>
+                    <div className="text-2xl mb-2">
+                      {badge.icon === "Target" && <Target className="w-6 h-6 text-blue-400 mx-auto" />}
+                      {badge.icon === "Flame" && <Flame className="w-6 h-6 text-orange-400 mx-auto" />}
+                      {badge.icon === "HandHeart" && <HandHeart className="w-6 h-6 text-green-400 mx-auto" />}
+                      {badge.icon === "BookOpen" && <BookOpen className="w-6 h-6 text-purple-400 mx-auto" />}
+                    </div>
                     <div className="text-xs font-medium text-white mb-1">
                       {badge.name}
                     </div>

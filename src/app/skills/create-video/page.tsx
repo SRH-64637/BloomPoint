@@ -113,7 +113,11 @@ export default function CreateVideoPage() {
 
   const validateForm = (): string | null => {
     if (!form.title.trim()) return "Video title is required";
+    if (form.title.length > 200) return "Title must be less than 200 characters";
+    
     if (!form.description.trim()) return "Video description is required";
+    if (form.description.length > 1000) return "Description must be less than 1000 characters";
+    
     if (form.tags.length === 0) return "At least one tag is required";
 
     if (form.videoType === "file" && !form.videoFile) {
@@ -123,6 +127,24 @@ export default function CreateVideoPage() {
     if (form.videoType !== "file" && !form.videoUrl.trim()) {
       return "Video URL is required";
     }
+
+    // Validate YouTube URL format
+    if (form.videoType === "youtube" && form.videoUrl.trim()) {
+      const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|embed\/)|youtu\.be\/)[\w-]+/;
+      if (!youtubeRegex.test(form.videoUrl.trim())) {
+        return "Please enter a valid YouTube URL";
+      }
+    }
+
+    // Validate Vimeo URL format
+    if (form.videoType === "vimeo" && form.videoUrl.trim()) {
+      const vimeoRegex = /^(https?:\/\/)?(www\.)?(vimeo\.com\/)[\d]+/;
+      if (!vimeoRegex.test(form.videoUrl.trim())) {
+        return "Please enter a valid Vimeo URL";
+      }
+    }
+
+    if (form.duration < 0) return "Duration must be a positive number";
 
     return null;
   };
@@ -167,15 +189,19 @@ export default function CreateVideoPage() {
         body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
+      let data;
+      try {
+        data = await res.json();
+      } catch (jsonError) {
+        console.error("Failed to parse JSON response:", jsonError);
+        throw new Error("Server returned invalid response. Please try again.");
+      }
 
       if (!res.ok) {
         if (res.status === 401) {
           throw new Error("Please log in to create a video.");
         } else if (res.status === 400) {
-          throw new Error(
-            `Invalid data: ${data.error || "Please check your input"}`
-          );
+          throw new Error(data.error || "Validation failed. Please check your input.");
         } else {
           throw new Error(
             data?.error || `Failed to create video (status ${res.status})`
@@ -290,15 +316,17 @@ export default function CreateVideoPage() {
                   <input
                     type="number"
                     min="0"
+                    max="9999"
+                    step="1"
                     value={form.duration}
                     onChange={(e) =>
                       setForm({
                         ...form,
-                        duration: parseInt(e.target.value) || 0,
+                        duration: Math.max(0, parseInt(e.target.value) || 0),
                       })
                     }
                     className="w-full p-3 border border-white/10 bg-black/20 rounded-lg text-white"
-                    placeholder="Duration"
+                    placeholder="Duration in minutes (e.g., 10, 30, 120)"
                   />
                 </div>
               </div>

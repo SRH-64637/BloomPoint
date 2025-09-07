@@ -6,17 +6,10 @@ import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import {
   Wind,
-  Music2,
   PenLine,
   Sparkles,
   Timer,
   Shuffle,
-  CloudRain,
-  Leaf,
-  Waves,
-  Flame,
-  Moon,
-  Coffee,
 } from "lucide-react";
 
 export default function WellnessPage() {
@@ -44,55 +37,6 @@ export default function WellnessPage() {
   const scaleForPhase = phase === "inhale" || phase === "hold" ? 1.12 : 1.0;
   const durationForPhase = phase === "hold" ? 2 : 4;
 
-  // Ambient sounds
-  const [rainOn, setRainOn] = useState(false);
-  const [forestOn, setForestOn] = useState(false);
-  const [oceanOn, setOceanOn] = useState(false);
-  const [windOn, setWindOn] = useState(false);
-  const [nightOn, setNightOn] = useState(false);
-  const [fireplaceOn, setFireplaceOn] = useState(false);
-  const [cafeOn, setCafeOn] = useState(false);
-  const rainRef = useRef<HTMLAudioElement | null>(null);
-  const forestRef = useRef<HTMLAudioElement | null>(null);
-  const oceanRef = useRef<HTMLAudioElement | null>(null);
-  const windRef = useRef<HTMLAudioElement | null>(null);
-  const nightRef = useRef<HTMLAudioElement | null>(null);
-  const fireplaceRef = useRef<HTMLAudioElement | null>(null);
-  const cafeRef = useRef<HTMLAudioElement | null>(null);
-
-  const ensureAudio = (
-    ref: MutableRefObject<HTMLAudioElement | null>,
-    src: string
-  ) => {
-    if (!ref.current) {
-      const el = new Audio(src);
-      el.loop = true;
-      el.volume = 0.2;
-      el.crossOrigin = "anonymous";
-      ref.current = el;
-    }
-    return ref.current!;
-  };
-
-  const toggleAudio = async (
-    ref: MutableRefObject<HTMLAudioElement | null>,
-    src: string,
-    on: boolean,
-    setOn: (v: boolean) => void
-  ) => {
-    const el = ensureAudio(ref, src);
-    try {
-      if (!on) {
-        await el.play();
-        setOn(true);
-      } else {
-        el.pause();
-        setOn(false);
-      }
-    } catch (e) {
-      // ignore play errors (e.g., autoplay restrictions)
-    }
-  };
 
   // Journaling
   const [entry, setEntry] = useState("");
@@ -252,150 +196,6 @@ export default function WellnessPage() {
           </Card>
         </motion.div>
 
-        {/* Ambient Sounds */}
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.05 }}
-        >
-          <Card className="rounded-2xl bg-white/10 backdrop-blur-md border-white/20 shadow-[0_10px_40px_rgba(0,0,0,0.15)]">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-white">
-                <Music2 className="w-5 h-5 text-teal-300" />
-                Ambient Sounds
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <Button
-                variant={rainOn ? "default" : "outline"}
-                className={`${
-                  rainOn
-                    ? "bg-teal-600 hover:bg-teal-700"
-                    : "border-white/20 hover:bg-white/10"
-                } rounded-xl justify-start`}
-                onClick={() =>
-                  toggleAudio(
-                    rainRef,
-                    "https://assets.mixkit.co/sfx/preview/mixkit-light-rain-loop-2393.mp3",
-                    rainOn,
-                    setRainOn
-                  )
-                }
-              >
-                <CloudRain className="w-4 h-4 mr-2" /> Rain
-              </Button>
-              <Button
-                variant={forestOn ? "default" : "outline"}
-                className={`${
-                  forestOn
-                    ? "bg-teal-600 hover:bg-teal-700"
-                    : "border-white/20 hover:bg-white/10"
-                } rounded-xl justify-start`}
-                onClick={() =>
-                  toggleAudio(
-                    forestRef,
-                    "https://assets.mixkit.co/sfx/preview/mixkit-forest-birds-ambience-1211.mp3",
-                    forestOn,
-                    setForestOn
-                  )
-                }
-              >
-                <Leaf className="w-4 h-4 mr-2" /> Forest
-              </Button>
-              <Button
-                variant={oceanOn ? "default" : "outline"}
-                className={`${
-                  oceanOn
-                    ? "bg-teal-600 hover:bg-teal-700"
-                    : "border-white/20 hover:bg-white/10"
-                } rounded-xl justify-start`}
-                onClick={() =>
-                  toggleAudio(
-                    oceanRef,
-                    "https://assets.mixkit.co/sfx/preview/mixkit-ocean-waves-loop-1195.mp3",
-                    oceanOn,
-                    setOceanOn
-                  )
-                }
-              >
-                <Waves className="w-4 h-4 mr-2" /> Ocean
-              </Button>
-              <Button
-                variant={windOn ? "default" : "outline"}
-                className={`${
-                  windOn
-                    ? "bg-teal-600 hover:bg-teal-700"
-                    : "border-white/20 hover:bg-white/10"
-                } rounded-xl justify-start`}
-                onClick={() =>
-                  toggleAudio(
-                    windRef,
-                    "https://assets.mixkit.co/sfx/preview/mixkit-strong-wind-noise-2462.mp3",
-                    windOn,
-                    setWindOn
-                  )
-                }
-              >
-                <Wind className="w-4 h-4 mr-2" /> Wind
-              </Button>
-              <Button
-                variant={nightOn ? "default" : "outline"}
-                className={`${
-                  nightOn
-                    ? "bg-teal-600 hover:bg-teal-700"
-                    : "border-white/20 hover:bg-white/10"
-                } rounded-xl justify-start`}
-                onClick={() =>
-                  toggleAudio(
-                    nightRef,
-                    "https://assets.mixkit.co/sfx/preview/mixkit-crickets-and-insects-in-the-night-ambience-2470.mp3",
-                    nightOn,
-                    setNightOn
-                  )
-                }
-              >
-                <Moon className="w-4 h-4 mr-2" /> Night
-              </Button>
-              <Button
-                variant={fireplaceOn ? "default" : "outline"}
-                className={`${
-                  fireplaceOn
-                    ? "bg-teal-600 hover:bg-teal-700"
-                    : "border-white/20 hover:bg-white/10"
-                } rounded-xl justify-start`}
-                onClick={() =>
-                  toggleAudio(
-                    fireplaceRef,
-                    "https://assets.mixkit.co/sfx/preview/mixkit-wood-fire-crackling-1333.mp3",
-                    fireplaceOn,
-                    setFireplaceOn
-                  )
-                }
-              >
-                <Flame className="w-4 h-4 mr-2" /> Fireplace
-              </Button>
-              <Button
-                variant={cafeOn ? "default" : "outline"}
-                className={`${
-                  cafeOn
-                    ? "bg-teal-600 hover:bg-teal-700"
-                    : "border-white/20 hover:bg-white/10"
-                } rounded-xl justify-start`}
-                onClick={() =>
-                  toggleAudio(
-                    cafeRef,
-                    "https://assets.mixkit.co/sfx/preview/mixkit-crowd-outdoor-voices-ambience-364.mp3",
-                    cafeOn,
-                    setCafeOn
-                  )
-                }
-              >
-                <Coffee className="w-4 h-4 mr-2" /> Cafe
-              </Button>
-            </CardContent>
-          </Card>
-        </motion.div>
-
         {/* Journaling */}
 
         <motion.div
@@ -492,7 +292,7 @@ export default function WellnessPage() {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.15 }}
+          transition={{ duration: 0.8, delay: 0.1 }}
         >
           <Card className="rounded-2xl bg-white/10 backdrop-blur-md border-white/20 shadow-[0_10px_40px_rgba(0,0,0,0.15)]">
             <CardHeader>
@@ -520,7 +320,7 @@ export default function WellnessPage() {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
+          transition={{ duration: 0.8, delay: 0.15 }}
         >
           <Card className="rounded-2xl bg-white/10 backdrop-blur-md border-white/20 shadow-[0_10px_40px_rgba(0,0,0,0.15)]">
             <CardHeader>

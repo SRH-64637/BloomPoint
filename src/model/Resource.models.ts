@@ -37,7 +37,7 @@ export interface IResource extends Document {
   progress?: number; // 0-100 for user progress tracking
 
   // References
-  createdBy: Types.ObjectId;
+  createdBy: string; // Clerk user ID
 
   // Engagement metrics
   views: number;
@@ -59,7 +59,7 @@ const VideoLectureSchema = new Schema<IVideoLecture>({
   description: {
     type: String,
     trim: true,
-    maxlength: 500,
+    maxlength: 1000,
   },
   videoUrl: {
     type: String,
@@ -102,7 +102,7 @@ const ResourceSchema = new Schema<IResource>(
       type: String,
       required: true,
       trim: true,
-      maxlength: 500,
+      maxlength: 1000,
     },
     content: {
       type: String,
@@ -162,8 +162,7 @@ const ResourceSchema = new Schema<IResource>(
 
     // References
     createdBy: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+      type: String, // Clerk user ID
       required: true,
     },
 

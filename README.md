@@ -1,162 +1,357 @@
-# BloomPoint Implementation Summary
+# BloomPoint - Learning & Career Platform
 
-## Implemented Features
+A comprehensive gamified learning and career development platform built with modern web technologies. BloomPoint combines educational resources, job opportunities, community features, and wellness tools to create an all-in-one platform for professional growth.
 
-### 1. Profile Page Integration
+## 🚀 Tech Stack
 
-- **Real User Data**: Profile page now fetches and displays current user's data from Clerk and maps it to our User model
-- **Dynamic XP System**: Shows real-time user XP, level, and progress from the database
-- **Authentication**: Proper loading states and authentication checks
-- **Data Fetching**: Integrates with `/api/me` and `/api/me/xp` endpoints
+- **Frontend**: Next.js 15, React 18, TypeScript
+- **Styling**: Tailwind CSS, Framer Motion, Shadcn/ui
+- **Backend**: Next.js API Routes, MongoDB with Mongoose
+- **Authentication**: Clerk (complete user management)
+- **File Storage**: Cloudinary (optional)
+- **Icons**: Lucide React
 
-### 2. Skills Page → Courses Section
+## 📋 Prerequisites
 
-- **My Courses Page**: New `/skills/my-courses` page showing courses created by the current user
-- **Course Management**: Displays courses from `create-course`, `create-multi-video`, and `create-video`
-- **User Ownership**: Properly tied to current user's ID through API integration
-- **Navigation**: Added "My Courses" button to the main courses page
+- Node.js 18 or higher
+- MongoDB database (local installation or MongoDB Atlas)
+- Clerk account for authentication setup
 
-### 3. Ownership Rules & Permissions
+## ⚡ Installation & Setup
 
-- **Permission System**: Created `src/lib/permissions.ts` utility for checking resource ownership
-- **Authorization Checks**: Functions to verify if user can edit/delete jobs, courses, and blogs
-- **Role-Based Access**: Support for USER, EMPLOYER, and ADMIN roles
-- **API Integration**: Permissions can be enforced at both API and frontend levels
-
-### 4. XP & Gamification System
-
-- **XP API**: New `/api/me/xp` endpoint for managing user experience points
-- **Job Application XP**: +50 XP when applying to jobs (integrated with job application flow)
-- **Dynamic Updates**: XP updates reflect immediately in Profile and Camp pages
-- **Level System**: Automatic level calculation based on XP thresholds
-- **Progress Tracking**: Visual progress bars showing XP to next level
-
-### 5. Camp Page Enhancements
-
-- **Real XP Integration**: Camp page now shows actual user XP from database
-- **Saved Content Section**: New section for saved jobs and courses (placeholder for future save functionality)
-- **Navigation Links**: Direct links to browse jobs and explore courses
-- **Consistent UI**: Maintains the existing design system and animations
-
-### 6. Clerk Theme Customization
-
-- **Custom Styling**: Replaced default Clerk cards with custom Tailwind + shadcn styling
-- **BloomPoint Theme**: Consistent with app's red/pink gradient theme
-- **Enhanced UX**: Better visual hierarchy, improved form elements, and smooth transitions
-- **Responsive Design**: Optimized for both sign-in and sign-up flows
-
-## 🔧 Technical Implementation
-
-### New API Endpoints
-
-- `POST /api/me/xp` - Add XP to user (for actions like applying to jobs)
-- `GET /api/me/xp` - Get user's current XP and level
-- `GET /api/me/courses` - Get courses created by current user
-- `GET /api/me/saved` - Get user's saved jobs and courses (placeholder)
-
-### Database Models Used
-
-- **User**: Clerk integration and role management
-- **UserXP**: XP tracking and level calculation
-- **Resource**: Course management and user ownership
-- **Job**: Job applications and XP rewards
-
-### Permission System
-
-```typescript
-// Check resource permissions
-const permissions = await checkResourcePermissions(resource.createdBy);
-if (permissions.canEdit) {
-  // Allow editing
-}
-
-// Check user roles
-const isAdmin = await isAdmin();
-const isEmployer = await isEmployer();
+### 1. Clone the Repository
+```bash
+git clone https://github.com/SRH-64637/BloomPoint.git
+cd bloompoint
 ```
 
-### XP Calculation
+### 2. Install Dependencies
+```bash
+npm install
+```
 
-- **Level Formula**: Each level requires `level * 100` XP
-- **Progress Tracking**: Visual progress bars with real-time updates
-- **Automatic Leveling**: Users automatically level up when XP threshold is met
+### 3. Environment Configuration
+Create a `.env.local` file in the root directory:
 
-## UI/UX Improvements
+```env
+# MongoDB Connection
+MongoDB_URI=mongodb://localhost:27017/bloompoint
+# OR for MongoDB Atlas:
+# MongoDB_URI=mongodb+srv://username:password@cluster.mongodb.net/bloompoint
 
-### Design Consistency
+# Clerk Authentication (Required)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_your_publishable_key
+CLERK_SECRET_KEY=sk_test_your_secret_key
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
+NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/camp
+NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/camp
 
-- All new components follow BloomPoint's existing design system
-- Consistent color scheme (red/pink gradients, dark backgrounds)
-- Smooth animations and transitions using Framer Motion
-- Responsive design for all screen sizes
+# Cloudinary (Optional - for file uploads)
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
 
-### User Experience
+### 4. Start Development Server
+```bash
+npm run dev
+```
 
-- Loading states for all data fetching operations
-- Proper error handling and user feedback
-- Intuitive navigation between related sections
-- Clear visual hierarchy and information architecture
+### 5. Access the Application
+- Open your browser and navigate to `http://localhost:3000` (or the port shown in terminal)
+- The application will automatically connect to your MongoDB database
+- Create an account or sign in using Clerk authentication
+- After authentication, you'll be redirected to the main dashboard at `/camp`
 
-## Future Enhancements
+## 📖 Page Functionality
 
-### Save/Bookmark System
+### 🏠 Core Pages
 
-- Implement actual save functionality for jobs and courses
-- User bookmark management
-- Saved content synchronization across devices
+#### **Home Page (`/`)**
+- **Purpose**: Landing page introducing BloomPoint
+- **Features**: 
+  - Hero section with platform overview
+  - Feature highlights and benefits
+  - Call-to-action buttons for registration
+  - Responsive design with modern animations
 
-### Advanced XP Features
+#### **Camp Dashboard (`/camp`)**
+- **Purpose**: Main user dashboard after authentication
+- **Features**:
+  - XP tracking and level progression
+  - Quick access cards to all platform features
+  - Achievement badges and progress indicators
+  - Personalized welcome message
+  - Navigation to Skills, Jobs, Lounge, and Wellness sections
 
-- XP rewards for completing courses
-- Achievement system integration
-- Social XP sharing and leaderboards
+#### **Skills Hub (`/skills`)**
+- **Purpose**: Central hub for all learning resources
+- **Features**:
+  - Browse all available learning content
+  - Filter by resource type (courses, blogs, videos)
+  - Tag-based filtering system
+  - Search functionality
+  - Create new resources (authenticated users only)
+  - Resource cards with thumbnails, descriptions, and metadata
 
-### Enhanced Permissions
+#### **Jobs Board (`/jobs`)**
+- **Purpose**: Job posting and application platform
+- **Features**:
+  - Browse job listings with detailed information
+  - Filter by location, salary range, experience level
+  - Job details including required skills and qualifications
+  - Apply to jobs with cover letter and resume
+  - Create job postings (authenticated users)
+  - Application status tracking
+  - Company information and job requirements
 
-- Comment system with user permissions
-- Resource sharing and collaboration features
-- Advanced role-based access control
+#### **Community Lounge (`/lounge`)**
+- **Purpose**: Community forum for discussions and networking
+- **Features**:
+  - Create and view discussion posts
+  - Comment on posts and engage with community
+  - React to posts with likes/reactions
+  - User profiles and interaction history
+  - Topic-based discussions
+  - Real-time updates and notifications
 
-## File Structure
+#### **Wellness Center (`/wellness`)**
+- **Purpose**: Mental health and wellness tools
+- **Features**:
+  - Personal journal entries (create, edit, view, delete)
+  - Breathing exercises with guided animations
+  - Positive affirmations with shuffle functionality
+  - One-minute meditation timer
+  - Mood tracking and wellness logs
+  - Private and secure journal storage
 
+#### **User Profile (`/profile`)**
+- **Purpose**: Personal profile and achievement tracking
+- **Features**:
+  - User information and statistics
+  - Achievement badges and progress
+  - XP history and level progression
+  - Created resources and contributions
+  - Personal settings and preferences
+
+### 🎯 Resource Management
+
+#### **Skills Pages**
+- **All Skills (`/skills`)**: Browse all learning resources with filtering
+- **Courses (`/skills/courses`)**: Dedicated course catalog with enrollment
+- **Blogs (`/skills/blogs`)**: Article library with reading progress
+- **Videos (`/skills/videos`)**: Video collection with playback features
+- **My Courses (`/skills/my-courses`)**: Personal enrolled courses dashboard
+
+#### **Resource Creation (Authenticated Users Only)**
+- **Create Blog (`/skills/create-blog`)**: 
+  - Rich text editor for article writing
+  - Tag management and categorization
+  - SEO-friendly URL generation
+  - Draft saving and publishing workflow
+
+- **Create Course (`/skills/create-course`)**:
+  - Link external courses from platforms
+  - Course metadata and descriptions
+  - Difficulty level and duration settings
+  - Thumbnail and preview management
+
+- **Create Video (`/skills/create-video`)**:
+  - Upload video files or embed URLs
+  - Support for YouTube, Vimeo, and direct uploads
+  - Video descriptions up to 1000 characters
+  - Duration tracking and metadata
+  - Thumbnail generation and management
+
+- **Create Multi-Video Course (`/skills/create-multi-video`)**:
+  - Comprehensive course creation with multiple lessons
+  - Lecture ordering and organization
+  - Progress tracking and completion status
+  - Course curriculum management
+
+### 💼 Job Management
+
+#### **Job Creation (`/jobs/create`)**
+- **Purpose**: Post new job opportunities
+- **Features**:
+  - Detailed job descriptions and requirements
+  - Salary range and location settings
+  - Required skills and experience levels
+  - Application deadline management
+  - Company information and branding
+
+#### **Job Applications**
+- **Purpose**: Apply to posted positions
+- **Features**:
+  - Cover letter and resume submission
+  - Application status tracking
+  - Interview scheduling integration
+  - Communication with employers
+  - Application history and management
+
+## 🔐 Authentication
+
+BloomPoint uses **Clerk** for complete user authentication and management.
+
+### Authentication Features
+- **Sign Up/Sign In**: Secure user registration and login
+- **Social Login**: Support for Google, GitHub, and other providers
+- **Email Verification**: Automatic email verification for new accounts
+- **Password Reset**: Self-service password recovery
+- **User Profiles**: Automatic profile creation and management
+
+### Protected Routes
+The following actions require user authentication:
+- Creating any content (blogs, videos, courses, jobs)
+- Applying to jobs
+- Writing journal entries
+- Participating in community discussions
+- Accessing personal dashboard and profile
+
+### Public Access
+These pages are accessible without authentication:
+- Home page (`/`)
+- Browse skills, courses, blogs, videos
+- View job listings
+- Read community posts (view only)
+
+## 🔌 API Overview
+
+### Core API Endpoints
+
+#### **Resources API (`/api/resources`)**
+- `GET /api/resources` - List all learning resources with filtering
+- `POST /api/resources` - Create new resource (authenticated)
+- `GET /api/resources/[id]` - Get specific resource details
+- `PUT /api/resources/[id]` - Update resource (owner only)
+- `DELETE /api/resources/[id]` - Delete resource (owner only)
+
+#### **Jobs API (`/api/jobs`)**
+- `GET /api/jobs` - List all job postings with filtering
+- `POST /api/jobs` - Create new job posting (authenticated)
+- `GET /api/jobs/[id]` - Get specific job details
+- `POST /api/jobs/apply` - Apply to job (authenticated)
+- `PUT /api/jobs/[id]` - Update job posting (owner only)
+
+#### **Wellness API (`/api/wellness`)**
+- `GET /api/wellness` - Get user's journal entries (authenticated)
+- `POST /api/wellness` - Create new journal entry (authenticated)
+- `DELETE /api/wellness?id=[id]` - Delete journal entry (owner only)
+
+#### **Community API (`/api/lounge`)**
+- `GET /api/lounge/posts` - Get community forum posts
+- `POST /api/lounge/posts` - Create new discussion post (authenticated)
+- `POST /api/lounge/comment` - Add comment to post (authenticated)
+- `POST /api/lounge/react` - React to post (authenticated)
+
+### Database Models
+- **Resource** - Learning content (blogs, courses, videos) with metadata
+- **Job** - Job postings with requirements and application tracking
+- **WellnessLog** - Personal journal entries and mood tracking
+- **Message** - Community forum posts and interactions
+
+## 🛠️ Development & Testing
+
+### Available Scripts
+```bash
+npm run dev    # Start development server with increased memory allocation
+npm run build  # Build for production
+npm run start  # Start production server
+npm run lint   # Run ESLint for code quality
+```
+
+### Project Structure
 ```
 src/
-├── app/
-│   ├── api/
-│   │   ├── me/
-│   │   │   ├── xp/route.ts          # XP management
-│   │   │   ├── courses/route.ts     # User's courses
-│   │   │   └── saved/route.ts       # Saved content
-│   │   └── jobs/apply/route.ts      # Updated with XP rewards
-│   ├── skills/
-│   │   └── my-courses/page.tsx      # User's created courses
-│   ├── profile/page.tsx             # Updated with real data
-│   └── camp/page.tsx                # Enhanced with saved content
-├── lib/
-│   └── permissions.ts               # Permission utilities
-└── model/                           # Database models
+├── app/                    # Next.js 15 app directory
+│   ├── api/               # API routes for backend functionality
+│   ├── (auth)/            # Authentication pages (sign-in/sign-up)
+│   ├── camp/              # Main dashboard
+│   ├── skills/            # Learning resources and creation pages
+│   ├── jobs/              # Job board and management
+│   ├── lounge/            # Community forum
+│   ├── wellness/          # Wellness tools and journaling
+│   └── profile/           # User profile management
+├── components/            # Reusable React components
+│   └── ui/               # Shadcn/ui component library
+├── lib/                  # Utility functions and configurations
+│   ├── dbConnect.ts      # MongoDB connection handler
+│   ├── permissions.ts    # Authorization utilities
+│   └── utils.ts          # General utility functions
+├── model/                # MongoDB/Mongoose schemas
+│   ├── Resource.models.ts # Learning resources schema
+│   ├── Job.models.ts     # Job postings schema
+│   └── ...               # Other data models
+└── constants.ts          # Application-wide constants
 ```
 
-## Security Features
+### Mock Data & Testing
+- The application automatically creates sample data when first accessed
+- All features can be tested with or without authentication
+- Use different user accounts to test multi-user functionality
+- Database can be reset by dropping the MongoDB collection
 
-- **Authentication**: All protected routes require Clerk authentication
-- **Authorization**: Resource ownership verification before edit/delete operations
-- **Input Validation**: Proper validation for all API endpoints
-- **Error Handling**: Secure error messages without exposing sensitive information
+## 🚀 Deployment
 
-## Testing Considerations
+### Production Build
+```bash
+npm run build
+npm start
+```
 
-- **API Endpoints**: Test all new endpoints with proper authentication
-- **Permission System**: Verify ownership checks work correctly
-- **XP System**: Ensure XP calculations and leveling work as expected
-- **UI Components**: Test responsive design and accessibility
-- **Error Scenarios**: Test loading states and error handling
+### Environment Setup for Production
+1. **MongoDB**: Ensure database is accessible from production environment
+2. **Clerk**: Configure production Clerk application with your domain
+3. **Environment Variables**: Set all required variables in production
+4. **Cloudinary**: Configure for file uploads (if using)
 
-## Responsive Design
+### Recommended Hosting Platforms
+- **Vercel** - Optimized for Next.js with automatic deployments
+- **Netlify** - Easy deployment with Git integration
+- **Railway** - Full-stack hosting with database support
+- **DigitalOcean** - VPS hosting for custom configurations
 
-- **Mobile First**: All new components are mobile-responsive
-- **Breakpoints**: Consistent with existing app breakpoints
-- **Touch Friendly**: Proper touch targets and mobile interactions
-- **Performance**: Optimized for mobile devices
+## 🐛 Troubleshooting
 
-This implementation provides a solid foundation for BloomPoint's gamification and user management features while maintaining the existing design aesthetic and user experience standards.
+### Common Issues
+
+**Memory Errors:**
+- The dev script includes `--max-old-space-size=4096` for increased memory
+- If still experiencing issues, increase the value or restart your system
+
+**Build Errors:**
+- Clear Next.js cache: `rm -rf .next` then `npm run build`
+- Verify all environment variables are properly set
+- Check for TypeScript compilation errors
+
+**Database Connection:**
+- Ensure MongoDB is running (local) or accessible (cloud)
+- Verify MongoDB_URI format in `.env.local`
+- Check database user permissions and network access
+
+**Authentication Issues:**
+- Confirm Clerk keys match your environment (development/production)
+- Verify redirect URLs in Clerk dashboard
+- Check that domain settings are correct
+
+**Performance Issues:**
+- Enable MongoDB indexing for better query performance
+- Optimize images using Cloudinary integration
+- Monitor bundle size and remove unused dependencies
+
+### Getting Help
+- Check the browser console for detailed error messages
+- Review server logs for API-related issues
+- Ensure all dependencies are properly installed
+- Verify Node.js version compatibility (18+)
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+**BloomPoint** - Empowering growth through gamified learning and career development.
+
+*Built with ❤️ using Next.js, MongoDB, and modern web technologies.*

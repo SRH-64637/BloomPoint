@@ -101,12 +101,34 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     await dbConnect();
+
+    // Add authentication check
     const { userId } = await auth();
 
     if (!userId) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401, headers: corsHeaders }
+      );
+    }
+
+    // Check content type and parse request body
+    const contentType = request.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      return NextResponse.json(
+        { error: "Content-Type must be application/json" },
+        { status: 400, headers: corsHeaders }
+      );
+    }
+
+    let body;
+    try {
+      body = await request.json();
+    } catch (parseError) {
+      console.error("JSON parsing error:", parseError);
+      return NextResponse.json(
+        { error: "Invalid JSON in request body" },
+        { status: 400, headers: corsHeaders }
       );
     }
 
@@ -122,7 +144,7 @@ export async function POST(request: Request) {
       difficulty,
       duration,
       videoLectures,
-    } = await request.json();
+    } = body;
 
     // Validate required fields
     if (!title || !description || !content || !type) {
@@ -185,7 +207,7 @@ export async function POST(request: Request) {
       difficulty,
       duration,
       videoLectures: type === "multi-video-course" ? videoLectures : undefined,
-      createdBy: userId, // This is now the Clerk user ID
+      createdBy: userId, // Clerk user ID as string
     });
 
     return NextResponse.json(
@@ -207,7 +229,7 @@ export async function POST(request: Request) {
     if (error.name === "ValidationError") {
       const errors = Object.values(error.errors).map((err: any) => err.message);
       return NextResponse.json(
-        { error: "Validation failed", details: errors },
+        { error: `Validation failed: ${errors.join(", ")}` },
         { status: 400, headers: corsHeaders }
       );
     }
