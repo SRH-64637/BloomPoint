@@ -2,7 +2,7 @@
 
 A comprehensive gamified learning and career development platform built with modern web technologies. BloomPoint combines educational resources, job opportunities, community features, and wellness tools to create an all-in-one platform for professional growth.
 
-## 🚀 Tech Stack
+## Tech Stack
 
 - **Frontend**: Next.js 15, React 18, TypeScript
 - **Styling**: Tailwind CSS, Framer Motion, Shadcn/ui
@@ -11,13 +11,13 @@ A comprehensive gamified learning and career development platform built with mod
 - **File Storage**: Cloudinary (optional)
 - **Icons**: Lucide React
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Node.js 18 or higher
 - MongoDB database (local installation or MongoDB Atlas)
 - Clerk account for authentication setup
 
-## ⚡ Installation & Setup
+## Installation & Setup
 
 ### 1. Clone the Repository
 ```bash
@@ -64,9 +64,9 @@ npm run dev
 - Create an account or sign in using Clerk authentication
 - After authentication, you'll be redirected to the main dashboard at `/camp`
 
-## 📖 Page Functionality
+## Page Functionality
 
-### 🏠 Core Pages
+### Core Pages
 
 #### **Home Page (`/`)**
 - **Purpose**: Landing page introducing BloomPoint
@@ -135,7 +135,7 @@ npm run dev
   - Created resources and contributions
   - Personal settings and preferences
 
-### 🎯 Resource Management
+### Resource Management
 
 #### **Skills Pages**
 - **All Skills (`/skills`)**: Browse all learning resources with filtering
@@ -170,7 +170,7 @@ npm run dev
   - Progress tracking and completion status
   - Course curriculum management
 
-### 💼 Job Management
+### Job Management
 
 #### **Job Creation (`/jobs/create`)**
 - **Purpose**: Post new job opportunities
@@ -190,7 +190,7 @@ npm run dev
   - Communication with employers
   - Application history and management
 
-## 🔐 Authentication
+## Authentication
 
 BloomPoint uses **Clerk** for complete user authentication and management.
 
@@ -216,7 +216,7 @@ These pages are accessible without authentication:
 - View job listings
 - Read community posts (view only)
 
-## 🔌 API Overview
+## API Overview
 
 ### Core API Endpoints
 
@@ -251,7 +251,7 @@ These pages are accessible without authentication:
 - **WellnessLog** - Personal journal entries and mood tracking
 - **Message** - Community forum posts and interactions
 
-## 🛠️ Development & Testing
+## Development & Testing
 
 ### Available Scripts
 ```bash
@@ -292,7 +292,7 @@ src/
 - Use different user accounts to test multi-user functionality
 - Database can be reset by dropping the MongoDB collection
 
-## 🚀 Deployment
+## Deployment
 
 ### Production Build
 ```bash
@@ -312,7 +312,7 @@ npm start
 - **Railway** - Full-stack hosting with database support
 - **DigitalOcean** - VPS hosting for custom configurations
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### Common Issues
 
@@ -346,12 +346,10 @@ npm start
 - Ensure all dependencies are properly installed
 - Verify Node.js version compatibility (18+)
 
-## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 
 **BloomPoint** - Empowering growth through gamified learning and career development.
 
-*Built with ❤️ using Next.js, MongoDB, and modern web technologies.*
+*Built with using Next.js, MongoDB, and modern web technologies.*
