@@ -22,6 +22,7 @@ import {
   Lightbulb,
   Users,
   Plus,
+  Play,
 } from "lucide-react";
 
 type Resource = {
@@ -591,6 +592,65 @@ export default function SkillsDashboard() {
           <div className="text-center mt-6">
             <Link href="/skills/courses">
               <Button variant="outline">View All Courses</Button>
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* Main Content - Videos */}
+      <section className="mx-auto mb-12 max-w-6xl">
+        <h2 className="mb-6 text-2xl font-semibold flex items-center gap-2">
+          <Monitor className="w-6 h-6" />
+          Videos
+        </h2>
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {videos.slice(0, 6).map((v) => (
+            <Link key={v._id} href={`/skills/videos/${v._id}`} className="group">
+              <Card className="overflow-hidden border-white/10 bg-black/20 hover:bg-black/30 transition-all duration-300">
+                <div className="relative h-40 w-full overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-pink-500/20 transition-transform duration-300 group-hover:scale-110" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm group-hover:bg-white/30 transition-colors">
+                      <Play className="w-8 h-8 text-white ml-1" />
+                    </div>
+                  </div>
+                  <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/60 to-transparent p-4 opacity-100 transition-opacity duration-300 group-hover:opacity-0">
+                    <h3 className="text-lg font-semibold">{v.title}</h3>
+                  </div>
+                  <div className="absolute inset-0 flex items-center justify-center p-4 text-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    <p className="text-sm text-white/90">{v.description}</p>
+                  </div>
+                </div>
+                <CardContent className="space-y-3 p-4">
+                  <div className="flex flex-wrap gap-2">
+                    {v.tags?.slice(0, 3).map((t) => (
+                      <Badge key={t} variant="secondary">
+                        {t}
+                      </Badge>
+                    ))}
+                  </div>
+                  <div className="flex items-center justify-between text-xs text-gray-400">
+                    {v.difficulty && (
+                      <Badge variant="outline" className="text-xs">
+                        {v.difficulty}
+                      </Badge>
+                    )}
+                    {v.duration && (
+                      <span>
+                        {Math.floor(v.duration / 60)}h{" "}
+                        {v.duration % 60}m
+                      </span>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          ))}
+        </div>
+        {videos.length > 6 && (
+          <div className="text-center mt-6">
+            <Link href="/skills/videos">
+              <Button variant="outline">View All Videos</Button>
             </Link>
           </div>
         )}
